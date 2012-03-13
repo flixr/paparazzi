@@ -25,6 +25,7 @@
 
 
 #include "subsystems/sensors/baro.h"
+#include "led.h"
 
 struct Baro baro;
 

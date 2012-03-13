@@ -35,10 +35,10 @@ enum BaroStatus {
 };
 
 struct Baro {
-  int32_t absolute;       ///< absolute pressure raw measurement
-  int32_t differential;   ///< differential pressure raw measurement
+  int32_t absolute;       ///< absolute pressure in hPa
+  int32_t differential;   ///< differential pressure in hPa
   float altitude;         ///< altitude above initial offset (so normally AGL)
-  float qfe;              ///< pressure at ground level in raw units (to calculate baro AGL)
+  float qfe;              ///< pressure at ground level in hPa (to calculate baro AGL)
   enum BaroStatus status;
 };
 
