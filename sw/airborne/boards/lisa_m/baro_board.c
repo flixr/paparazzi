@@ -2,7 +2,6 @@
 #include "subsystems/sensors/baro.h"
 #include <stm32/gpio.h>
 
-struct Baro baro;
 struct BaroBoard baro_board;
 struct i2c_transaction baro_trans;
 struct bmp085_baro_calibration calibration;
@@ -67,10 +66,7 @@ static void bmp085_baro_read_calibration(void)
   calibration.md = bmp085_read_reg16_blocking(0xBE); // MD
 }
 
-void baro_init(void) {
-  baro.status = BS_UNINITIALIZED;
-  baro.absolute     = 0;
-  baro.differential = 0;
+void baro_impl_init(void) {
   baro_board.status = LBS_UNINITIALIZED;
   bmp085_baro_read_calibration();
 

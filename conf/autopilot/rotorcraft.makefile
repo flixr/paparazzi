@@ -139,6 +139,7 @@ ap.srcs += $(SRC_FIRMWARE)/commands.c
 # BARO
 #
 ap.srcs += $(SRC_BOARD)/baro_board.c
+ap.srcs += subsystems/sensors/baro.c
 ifeq ($(BOARD), booz)
 else ifeq ($(BOARD), lisa_l)
 ap.CFLAGS += -DUSE_I2C2

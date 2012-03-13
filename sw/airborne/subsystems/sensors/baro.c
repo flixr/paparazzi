@@ -19,41 +19,29 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/** @file baro.h
+/** @file subsystems/sensors/baro.c
  *  Common barometric sensor interface
  */
 
-#ifndef SUBSYSTEMS_SENSORS_BARO_H
-#define SUBSYSTEMS_SENSORS_BARO_H
 
-#include <std.h>
+#include "subsystems/sensors/baro.h"
 
-enum BaroStatus {
-  BS_UNINITIALIZED,
-  BS_RUNNING,
-  BS_ALIGNED
-};
+struct Baro baro;
 
-struct Baro {
-  int32_t absolute;       ///< absolute pressure raw measurement
-  int32_t differential;   ///< differential pressure raw measurement
-  float altitude;         ///< altitude above initial offset (so normally AGL)
-  float qfe;              ///< pressure at ground level in raw units (to calculate baro AGL)
-  enum BaroStatus status;
-};
+void baro_init(void) {
+  baro.status = BS_UNINITIALIZED;
+  baro.absolute     = 0;
+  baro.differential = 0;
+  baro.altitude = 0.;
+  baro.qfe = 0.;
 
-extern struct Baro baro;
-
-#include BOARD_CONFIG
-#if defined BOARD_HAS_BARO
-#include "baro_board.h"
+#ifdef BARO_LED
+  LED_OFF(BARO_LED);
 #endif
+  baro_impl_init();
+}
 
-/** baro specific init implementation */
-extern void baro_impl_init(void);
-
-extern void baro_init(void);
-extern void baro_periodic(void);
-extern void baro_realign(void);
-
-#endif /* SUBSYSTEMS_SENSORS_BARO_H */
+void baro_realign(void) {
+  if (baro.status == BS_ALIGNED)
+    baro.status = BS_RUNNING;
+}

@@ -21,51 +21,45 @@
  */
 
 
-/* driver for the analog Barometer Mpxa6115 using ADC ads1114 (16 bits I2C 860SpS max) from Texas instruments
- * Navarro & Gorraz & Hattenberger
+/** @file boards/umarim/baro_board.c
+ *  Driver for the analog Barometer Mpxa6115 using ADC ads1114 (16 bits I2C 860SpS max) from Texas instruments
+ *  Navarro & Gorraz & Hattenberger
  */
 
 #include "subsystems/sensors/baro.h"
 
 
-/* Common Baro struct */
-struct Baro baro;
-
-#if USE_BARO_AS_ALTIMETER
-/* Number of values to compute an offset at startup */
+/** Number of values to compute an offset at startup */
 #define OFFSET_NBSAMPLES_AVRG 100
 
-/* Weight for offset IIR filter */
+/** Weight for offset IIR filter */
 #define OFFSET_FILTER 7
 
-float baro_alt;
-float baro_alt_offset;
 uint16_t offset_cnt;
-#endif
 
 void baro_init( void ) {
   ads1114_init();
-  baro.status = BS_UNINITIALIZED;
-  baro.absolute     = 0;
-  baro.differential = 0; /* not handled on this board, use extra module (ex: airspeed_ads1114) */
-#if USE_BARO_AS_ALTIMETER
-  baro_alt = 0.;
-  baro_alt_offset = 0.;
+
   offset_cnt = OFFSET_NBSAMPLES_AVRG;
-#endif
 }
 
 void baro_periodic( void ) {
-
-#if USE_BARO_AS_ALTIMETER
-  if (baro.status == BS_UNINITIALIZED && BARO_ABS_ADS.data_available) {
-    // IIR filter to compute an initial offset
-    baro_alt_offset = (OFFSET_FILTER * baro_alt_offset + (float)baro.absolute) / (OFFSET_FILTER + 1);
-    // decrease init counter
-    --offset_cnt;
-    if (offset_cnt == 0) baro.status = BS_RUNNING;
+  if (BARO_ABS_ADS.data_available) {
+    if(baro.status == BS_ALIGNED) {
+      baro.altitude = BARO_SENS*(baro.qfe - (float)baro.absolute);
+    }
+    else if (baro.status == BS_UNINITIALIZED) {
+      baro.status = BS_RUNNING;
+    }
+    else if (baro.status == BS_RUNNING) {
+      // IIR filter to compute an initial offset
+      baro.qfe = (OFFSET_FILTER * baro.qfe + (float)baro.absolute) / (OFFSET_FILTER + 1);
+      // decrease init counter
+      --offset_cnt;
+      if (offset_cnt == 0) baro.status = BS_ALIGNED;
+    }
   }
-#endif
+
   // Read the ADC
   ads1114_read(&BARO_ABS_ADS);
 }

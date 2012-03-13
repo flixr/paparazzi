@@ -9,7 +9,7 @@
   <event fun="BaroEvent(baro_abs,baro_diff)"/>
   <makefile target="ap">
     <file name="baro_board.c" dir="boards/$(BOARD)"/>
-    <define name="USE_BARO_AS_ALTIMETER"/>
+    <file name="baro.c" dir="subsystems/sensors"/>
     <raw>
 ifeq ($(BOARD), navgo)
   ap.CFLAGS += -DUSE_I2C1 -DUSE_ADS1114_1

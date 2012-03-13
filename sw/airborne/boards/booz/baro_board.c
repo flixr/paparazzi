@@ -1,6 +1,5 @@
-/* $Id$
- *
- * Copyright (C) 2010 The Paparazzi Team
+/*
+ * Copyright (C) 2010-2012 The Paparazzi Team
  *
  * This file is part of paparazzi.
  *
@@ -26,31 +25,23 @@
 #include "generated/airframe.h"
 #include "led.h"
 
-/* threshold >0 && <1023 */
 #ifndef BOOZ_ANALOG_BARO_THRESHOLD
+/** threshold >0 && <1023 */
 #define BOOZ_ANALOG_BARO_THRESHOLD 850
 #endif
 
-struct Baro baro;
 struct BaroBoard baro_board;
 
 
-void baro_init( void ) {
+void baro_impl_init( void ) {
 
   adc_buf_channel(ADC_CHANNEL_BARO, &baro_board.buf, DEFAULT_AV_NB_SAMPLE);
-
-  baro.status = BS_UNINITIALIZED;
-  baro.absolute     = 0;
-  baro.differential = 0; /* not handled on this board */
 
   baro_board.offset = 1023;
   DACSet(baro_board.offset);
 
   baro_board.value_filtered = 0;
   baro_board.data_available = FALSE;
-#ifdef BARO_LED
-  LED_OFF(BARO_LED);
-#endif
 }
 
 void baro_periodic(void) {
@@ -83,7 +74,3 @@ void baro_board_calibrate(void) {
 #endif
   }
 }
-
-
-
-

@@ -40,18 +40,12 @@
  * */
 #define DIFF_FILTER_GAIN 5
 
-#if USE_BARO_AS_ALTIMETER
-extern float baro_alt;
-extern float baro_alt_offset;
-#define BaroAltHandler() { baro_alt = BARO_SENS*(baro_alt_offset - (float)baro.absolute); }
-#endif
-
 #define BARO_ABS_ADS ads1114_1
 
 #define BaroAbs(_ads, _handler) {           \
   if (_ads.data_available) {                \
     baro.absolute = (baro.absolute + BARO_FILTER_GAIN*Ads1114GetValue(_ads)) / (BARO_FILTER_GAIN+1); \
-    if (baro.status == BS_RUNNING) {        \
+    if (baro.status == BS_ALIGNED) {        \
       _handler();                           \
       _ads.data_available = FALSE;          \
     }                                       \
@@ -68,7 +62,7 @@ extern float baro_alt_offset;
 #define BaroDiff(_ads, _handler) {          \
   if (_ads.data_available) {                \
     baro.differential = (baro.differential + DIFF_FILTER_GAIN*Ads1114GetValue(_ads)) / (DIFF_FILTER_GAIN+1); \
-    if (baro.status == BS_RUNNING) {        \
+    if (baro.status == BS_ALIGNED) {        \
       _handler();                           \
       _ads.data_available = FALSE;          \
     }                                       \
