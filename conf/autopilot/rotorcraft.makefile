@@ -152,7 +152,7 @@ ap.CFLAGS += -DSPI_MASTER
 ap.srcs += peripherals/mcp355x.c
 endif
 ifneq ($(BARO_LED),none)
-ap.CFLAGS += -DROTORCRAFT_BARO_LED=$(BARO_LED)
+ap.CFLAGS += -DBARO_LED=$(BARO_LED)
 endif
 
 #

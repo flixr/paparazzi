@@ -89,7 +89,6 @@ sim.srcs += $(SRC_FIRMWARE)/datalink.c
 #
 sim.srcs += math/pprz_geodetic_int.c math/pprz_geodetic_float.c math/pprz_geodetic_double.c math/pprz_trig_int.c
 
-sim.CFLAGS += -DROTORCRAFT_BARO_LED=2
 sim.srcs += $(SRC_BOARD)/baro_board.c
 
 sim.CFLAGS += -DUSE_ADC

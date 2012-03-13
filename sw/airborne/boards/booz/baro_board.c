@@ -48,8 +48,8 @@ void baro_init( void ) {
 
   baro_board.value_filtered = 0;
   baro_board.data_available = FALSE;
-#ifdef ROTORCRAFT_BARO_LED
-  LED_OFF(ROTORCRAFT_BARO_LED);
+#ifdef BARO_LED
+  LED_OFF(BARO_LED);
 #endif
 }
 
@@ -72,14 +72,14 @@ void baro_board_calibrate(void) {
     else
       baro_board.offset--;
     DACSet(baro_board.offset);
-#ifdef ROTORCRAFT_BARO_LED
-    LED_TOGGLE(ROTORCRAFT_BARO_LED);
+#ifdef BARO_LED
+    LED_TOGGLE(BARO_LED);
 #endif
   }
   else {
     baro.status = BS_RUNNING;
-#ifdef ROTORCRAFT_BARO_LED
-    LED_ON(ROTORCRAFT_BARO_LED);
+#ifdef BARO_LED
+    LED_ON(BARO_LED);
 #endif
   }
 }

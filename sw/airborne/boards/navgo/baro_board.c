@@ -42,8 +42,8 @@ void baro_init( void ) {
   baro.status = BS_UNINITIALIZED;
   baro.absolute     = 0;
   baro.differential = 0; /* not handled on this board */
-#ifdef ROTORCRAFT_BARO_LED
-  LED_OFF(ROTORCRAFT_BARO_LED);
+#ifdef BARO_LED
+  LED_OFF(BARO_LED);
 #endif
   startup_cnt = STARTUP_COUNTER;
 }
@@ -53,13 +53,13 @@ void baro_periodic( void ) {
   if (baro.status == BS_UNINITIALIZED) {
     // Run some loops to get correct readings from the adc
     --startup_cnt;
-#ifdef ROTORCRAFT_BARO_LED
-    LED_TOGGLE(ROTORCRAFT_BARO_LED);
+#ifdef BARO_LED
+    LED_TOGGLE(BARO_LED);
 #endif
     if (startup_cnt == 0) {
       baro.status = BS_RUNNING;
-#ifdef ROTORCRAFT_BARO_LED
-      LED_ON(ROTORCRAFT_BARO_LED);
+#ifdef BARO_LED
+      LED_ON(BARO_LED);
 #endif
     }
   }
