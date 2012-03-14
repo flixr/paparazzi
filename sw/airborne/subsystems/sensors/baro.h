@@ -19,7 +19,7 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/** @file baro.h
+/** @file subsystems/sensors/baro.h
  *  Common barometric sensor interface
  */
 
@@ -30,30 +30,48 @@
 
 enum BaroStatus {
   BS_UNINITIALIZED,
-  BS_RUNNING,
-  BS_ALIGNED
+  BS_RUNNING
 };
 
+typedef void (*baro_cb) (struct Baro *b);
+
+/** Generic baro structure */
 struct Baro {
-  int32_t absolute;       ///< absolute pressure in hPa
-  int32_t differential;   ///< differential pressure in hPa
-  float altitude;         ///< altitude above initial offset (so normally AGL)
-  float qfe;              ///< pressure at ground level in hPa (to calculate baro AGL)
+  uint32_t pressure;      ///< absolute pressure in Pascal
+  uint16_t temp;          ///< temperature in Kelvin * 10e-2
+  float alt_agl;          ///< altitude AGL in meters (above initial offset)
+  uint32_t qfe;           ///< pressure at ground level in Pa (to calculate baro AGL)
+
+  bool_t qfe_initialized; ///< true if QFE was initialized
+  bool_t valid;           ///< true if current values are valid
+  bool_t filter_enabled;  ///< true if low-pass filtering for agl is enabled
+  float r;                ///< altitude measurement noise of this baro
+
+  baro_cb cb;             ///< callback function
   enum BaroStatus status;
 };
 
-extern struct Baro baro;
+/** pointer to baro used for the global state */
+extern struct Baro* baro;
 
 #include BOARD_CONFIG
 #if defined BOARD_HAS_BARO
 #include "baro_board.h"
 #endif
 
-/** baro specific init implementation */
-extern void baro_impl_init(void);
+/** Initialize generic baro structure.
+ * @param b Baro struct to initialize
+ */
+extern void baro_init(struct Baro *b, baro_cb cb);
 
-extern void baro_init(void);
-extern void baro_periodic(void);
-extern void baro_realign(void);
+extern void baro_realign(struct Baro *b);
+
+/**
+ * Add a barometer measurement.
+ * Also calculates the altitute and applies configured filters.
+ * @param b     Baro struct to add the measurement to
+ * @param meas  barometric pressure measurement in Pascal
+ */
+extern void baro_add_measurement(struct Baro *b, uint32_t meas);
 
 #endif /* SUBSYSTEMS_SENSORS_BARO_H */

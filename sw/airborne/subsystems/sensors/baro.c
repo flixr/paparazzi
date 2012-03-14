@@ -25,24 +25,57 @@
 
 
 #include "subsystems/sensors/baro.h"
-#include "led.h"
 
-struct Baro baro;
+/** Number of values to compute an offset at startup */
+#define QFE_NBSAMPLES_AVRG 100
 
-void baro_init(void) {
-  baro.status = BS_UNINITIALIZED;
-  baro.absolute     = 0;
-  baro.differential = 0;
-  baro.altitude = 0.;
-  baro.qfe = 0.;
+/** Weight for offset IIR filter */
+#define QFE_FILTER 7
 
-#ifdef BARO_LED
-  LED_OFF(BARO_LED);
-#endif
-  baro_impl_init();
+// TODO set proper scale here
+#define PRESSURE_TO_M 3.3
+
+void baro_init(struct Baro *b, baro_cb cb) {
+  b->status = BS_UNINITIALIZED;
+  b->pressure = 0;
+  b->temp = 0;
+  b->qfe = 0;
+  b->alt_agl = 0.0;
+  b->qfe_initialized = FALSE;
+  b->valid = FALSE;
+  b->filter_enabled = FALSE;
+  b->qfe_cnt = QFE_NBSAMPLES_AVRG;
+  b->cb = cb;
 }
 
-void baro_realign(void) {
-  if (baro.status == BS_ALIGNED)
-    baro.status = BS_RUNNING;
+void baro_realign(struct Baro *b) {
+  b->qfe_initialized = FALSE;
+  b->qfe = 0;
+  b->qfe_cnt = QFE_NBSAMPLES_AVRG;
+}
+
+void baro_add_measurement(struct Baro *b, uint32_t meas) {
+  b->pressure = meas;
+  b->valid = TRUE;
+
+  if (!baro.qfe_initialized) {
+    /* IIR filter to compute an initial offset */
+    b->qfe = (QFE_FILTER * (float)b->qfe + (float)b->absolute) / (QFE_FILTER + 1);
+    /* decrease init counter */
+    b->offset_cnt--;
+    if (b->offset_cnt == 0)
+      b->qfe_initialized = TRUE;
+  }
+  else {
+
+    /* IIR filter to low-pass computed altitude */
+    if (b->filter_enabled) {
+      // TODO: filter pressure measurements
+    }
+    /* calculate altitude from pressure measurement */
+    b->alt_agl = PRESSURE_TO_M*(float)(b->qfe - b->absolute)
+  }
+
+  /* call call-back function if set */
+  if (b->cb) b->cb(b);
 }
