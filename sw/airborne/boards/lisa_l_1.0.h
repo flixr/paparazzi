@@ -99,6 +99,9 @@
 
 #define ACTUATORS_PWM_NB 6
 
+// Servo numbering on LisaL silkscreen/docs starts with 1
+#define PWM_SERVO_NOT_FOUND Error hint: Servo numbering on LisaL starts with 1
+
 // PWM_SERVO_x is the index of the servo in the actuators_pwm_values array
 #if USE_PWM1
 #define PWM_SERVO_1 0

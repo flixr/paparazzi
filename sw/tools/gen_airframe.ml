@@ -121,7 +121,16 @@ let parse_servo = fun driver c ->
   let name = "SERVO_"^shortname
   and no_servo = int_of_string (ExtXml.attrib c "no") in
 
-  define name (string_of_int no_servo);
+  if driver = "Pwm" then
+    begin
+      let pwm_servo = "PWM_SERVO_"^(string_of_int no_servo) in
+      printf "#ifndef %s\n" pwm_servo;
+      printf "ERROR_VALUE(\"Servo number %i not available\\n\",PWM_SERVO_NOT_FOUND)\n" no_servo;
+      printf "#endif\n";
+      define name pwm_servo
+    end
+  else
+    define name (string_of_int no_servo);
 
   let min = fos (ExtXml.attrib c "min" )
   and neutral = fos (ExtXml.attrib c "neutral")

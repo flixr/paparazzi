@@ -1,7 +1,6 @@
 #ifndef CONFIG_LISA_M_COMMON_H
 #define CONFIG_LISA_M_COMMON_H
 
-#include "generated/airframe.h"
 
 /* SPI slave mapping */
 
@@ -110,6 +109,7 @@
 #endif
 
 // Servo numbering on LisaM silkscreen/docs starts with 1
+#define PWM_SERVO_NOT_FOUND Error hint: Servo numbering on LisaM starts with 1
 
 // PWM_SERVO_x is the index of the servo in the actuators_pwm_values array
 #if USE_PWM1

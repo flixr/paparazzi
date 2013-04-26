@@ -42,6 +42,8 @@
 #define INFO_VALUE(x,v) DO_PRAGMA(message ("Info: " x VALUE(v)))
 #define INFO_VAR(var) DO_PRAGMA(message ("INFO: " #var " = " VALUE(var)))
 
+#define ERROR_VALUE(x,v) DO_PRAGMA(message ("Error: " x VALUE(v)))
+
 /* only if PRINT_CONFIG is true */
 #if PRINT_CONFIG
 #define PRINT_CONFIG_MSG(x) DO_PRAGMA(message ("Config: " x))
