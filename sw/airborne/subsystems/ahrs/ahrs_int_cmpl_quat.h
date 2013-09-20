@@ -47,8 +47,8 @@ struct AhrsIntCmplQuat {
   struct Int32Quat   ltp_to_imu_quat;
   struct Int32Vect3  mag_h;
 
-  int32_t ltp_vel_norm;
-  bool_t ltp_vel_norm_valid;
+  struct Int32Vect3 ltp_vel;
+  bool_t ltp_vel_valid;
   bool_t heading_aligned;
   float weight;
   float accel_inv_kp;

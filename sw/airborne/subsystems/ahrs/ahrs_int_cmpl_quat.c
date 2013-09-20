@@ -121,7 +121,7 @@ static inline void ahrs_update_mag_2d(void);
 void ahrs_init(void) {
 
   ahrs.status = AHRS_UNINIT;
-  ahrs_impl.ltp_vel_norm_valid = FALSE;
+  ahrs_impl.ltp_vel_valid = FALSE;
   ahrs_impl.heading_aligned = FALSE;
 
   /* set ltp_to_imu so that body is zero */
@@ -243,13 +243,12 @@ void ahrs_update_accel(void) {
 
   struct Int32Vect3 pseudo_gravity_measurement;
 
-  if (ahrs_impl.correct_gravity && ahrs_impl.ltp_vel_norm_valid) {
+  if (ahrs_impl.correct_gravity && ahrs_impl.ltp_vel_valid) {
     /*
      * centrifugal acceleration in body frame
      * a_c_body = omega x (omega x r)
      * (omega x r) = tangential velocity in body frame
      * a_c_body = omega x vel_tangential_body
-     * assumption: tangential velocity only along body x-axis
      */
 
     // FIXME: check overflows !
@@ -257,7 +256,9 @@ void ahrs_update_accel(void) {
 #define ACC_FROM_CROSS_FRAC INT32_RATE_FRAC + INT32_SPEED_FRAC - INT32_ACCEL_FRAC - COMPUTATION_FRAC
 
     const struct Int32Vect3 vel_tangential_body =
-      {ahrs_impl.ltp_vel_norm >> COMPUTATION_FRAC, 0, 0};
+      {ahrs_impl.ltp_vel.x >> COMPUTATION_FRAC,
+       ahrs_impl.ltp_vel.y >> COMPUTATION_FRAC,
+       ahrs_impl.ltp_vel.z >> COMPUTATION_FRAC};
     struct Int32Vect3 acc_c_body;
     VECT3_RATES_CROSS_VECT3(acc_c_body, (*stateGetBodyRates_i()), vel_tangential_body);
     INT32_VECT3_RSHIFT(acc_c_body, acc_c_body, ACC_FROM_CROSS_FRAC);
@@ -485,10 +486,10 @@ static inline void ahrs_update_mag_2d(void) {
 void ahrs_update_gps(void) {
 #if AHRS_GRAVITY_UPDATE_COORDINATED_TURN && USE_GPS
   if (gps.fix == GPS_FIX_3D) {
-    ahrs_impl.ltp_vel_norm = SPEED_BFP_OF_REAL(gps.speed_3d / 100.);
-    ahrs_impl.ltp_vel_norm_valid = TRUE;
+    ahrs_impl.ltp_vel = SPEEDS_BFP_OF_REAL(gps.ned_vel / 100.);
+    ahrs_impl.ltp_vel_valid = TRUE;
   } else {
-    ahrs_impl.ltp_vel_norm_valid = FALSE;
+    ahrs_impl.ltp_vel_valid = FALSE;
   }
 #endif
 
