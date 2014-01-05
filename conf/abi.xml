@@ -3,11 +3,11 @@
 <protocol>
 
   <class name="airborne">
-    <!--message name="TEST_ABI" id="0">
+    <message name="TEST_ABI" id="0">
       <field name="value" type="int8_t"/>
       <field name="boo" type="struct abi_boo"/>
       <field name="vect" type="struct Int32Vect3 *"/>
-    </message-->
+    </message>
 
     <message name="BARO_ABS" id="1">
       <field name="pressure" type="float" unit="Pa"/>

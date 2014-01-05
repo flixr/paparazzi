@@ -15,6 +15,7 @@
     <target name="test_sys_time_timer"      board="lisa_m_2.0"/>
 	<target name="test_sys_time_usleep"     board="lisa_m_2.0"/>
     <target name="test_telemetry"           board="lisa_m_2.0"/>
+    <target name="test_abi"                 board="lisa_m_2.0"/>
     <target name="test_ms2100"              board="lisa_m_2.0"/>
 
     <target name="test_actuators_pwm"       board="lisa_m_2.0">

@@ -115,6 +115,15 @@ test_telemetry.srcs   += test/test_telemetry.c
 
 
 #
+# a test program for ABI
+#
+test_abi.ARCHDIR = $(ARCH)
+test_abi.CFLAGS += $(COMMON_TEST_CFLAGS)
+test_abi.srcs   += $(COMMON_TEST_SRCS)
+test_abi.srcs += test/test_abi.c
+
+
+#
 # test ms2100 mag
 #
 test_ms2100.ARCHDIR = $(ARCH)

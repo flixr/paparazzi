@@ -22,7 +22,8 @@
 #define ABI_C
 
 #include "mcu.h"
-#include "sys_time.h"
+#include "mcu_periph/sys_time.h"
+#include "led.h"
 
 struct abi_boo {
   int a;
@@ -34,14 +35,16 @@ struct abi_boo {
 // ABI event and callback for TEST_ABI message
 abi_event ev;
 
-static void test_cb (const int8_t value, const struct abi_boo boo, const struct Int32Vect3 * vect) {
-  switch (value) {
-    case 0 :
+static void test_cb (uint8_t sender_id, const int8_t * value, const struct abi_boo * boo, const struct Int32Vect3 * * vect) {
+  switch (*value) {
+    case 0:
       LED_TOGGLE(1); break;
-    case 1 :
+    case 1:
       LED_TOGGLE(2); break;
-    case 2 :
+    case 2:
       LED_TOGGLE(3); break;
+    default:
+      break;
   };
 }
 
@@ -54,8 +57,8 @@ static inline void main_event_task( void );
 int main(void) {
   main_init();
 
-  while(1) {
-    if (sys_time_periodic())
+  while (1) {
+    if (sys_time_check_and_ack_timer(0))
       main_periodic_task();
     main_event_task();
   }
@@ -71,7 +74,7 @@ static inline void main_init( void ) {
   mcu_int_enable();
 
   // Bind to ABI message
-  AbiBindMsgTEST_ABI(&ev, test_cb);
+  AbiBindMsgTEST_ABI(0, &ev, test_cb);
 }
 
 
@@ -80,7 +83,8 @@ static inline void main_periodic_task( void ) {
   static int8_t val = 0;
   struct abi_boo b = { 1, 2 };
   struct Int32Vect3 v = { 3, 4, 5 };
-  RunOnceEvery(60,{ AbiSendMsgTEST_ABI(val,b,&v); val=(val+1)%3; });
+  const struct Int32Vect3 *pv = &v;
+  RunOnceEvery(60,{ AbiSendMsgTEST_ABI(1, &val, &b, &pv); val=(val+1)%3; });
 }
 
 
