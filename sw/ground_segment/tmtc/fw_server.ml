@@ -42,7 +42,8 @@ let rec norm_course =
 
 let fvalue = fun x ->
   match x with
-      Pprz.Float x -> x
+      Pprz.Double x -> x
+    | Pprz.Float x -> x
     | Pprz.Int32 x -> Int32.to_float x
     | Pprz.Int x -> float_of_int x
     | _ -> failwith (sprintf "Receive.log_and_parse: float expected, got '%s'" (Pprz.string_of_value x))

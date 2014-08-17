@@ -47,7 +47,7 @@ let one_ac = fun (notebook:GPack.notebook) ac_name ->
 
       let vs = ["ac_id", Pprz.String ac_id; "index", Pprz.Int idx] in
       if classify_float value = FP_normal || classify_float value =FP_zero then
-        let vs' = ("value", Pprz.Float value) :: vs in
+        let vs' = ("value", Pprz.Double value) :: vs in
         Ground_Pprz.message_send "dl" "DL_SETTING" vs'
       else
         Ground_Pprz.message_send "dl" "GET_DL_SETTING" vs in
@@ -59,7 +59,7 @@ let one_ac = fun (notebook:GPack.notebook) ac_name ->
 
     (* Bind to values updates *)
     let get_dl_value = fun _sender vs ->
-      settings#set (Pprz.int_assoc "index" vs) (Pprz.float_assoc "value" vs)
+      settings#set (Pprz.int_assoc "index" vs) (Pprz.double_assoc "value" vs)
     in
     ignore (Tele_Pprz.message_bind "DL_VALUE" get_dl_value);
 

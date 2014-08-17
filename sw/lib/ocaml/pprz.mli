@@ -33,7 +33,7 @@ type _type =
   | ArrayType of string
   | FixedArrayType of string * int
 type value =
-    Int of int | Float of float | String of string | Int32 of int32 | Char of char | Int64 of int64
+    Int of int | Float of float | Double of float | String of string | Int32 of int32 | Char of char | Int64 of int64
   | Array of value array
 type field = {
     _type : _type;
@@ -80,6 +80,7 @@ val string_assoc : string -> values -> string
 (** May raise Not_found *)
 
 val float_assoc : string -> values -> float
+val double_assoc : string -> values -> float
 val int_assoc : string -> values -> int
 val int32_assoc : string -> values -> Int32.t
 val int64_assoc : string -> values -> Int64.t

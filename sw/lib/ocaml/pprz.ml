@@ -34,7 +34,7 @@ type _type =
   | ArrayType of string
   | FixedArrayType of string * int
 type value =
-    Int of int | Float of float | String of string | Int32 of int32 | Char of char | Int64 of int64
+    Int of int | Float of float | Double of float | String of string | Int32 of int32 | Char of char | Int64 of int64
   | Array of value array
 type field = {
   _type : _type;
@@ -97,7 +97,7 @@ let types = [
   ("int32",  { format = "%ld" ;  glib_type = "gint32"; inttype = "int32_t";  size = 4; value=Int 42 });
   ("int64",  { format = "%Ld" ;  glib_type = "gint64"; inttype = "int64_t";  size = 8; value=Int 42 });
   ("float",  { format = "%f" ;  glib_type = "gfloat"; inttype = "float";  size = 4; value=Float 4.2 });
-  ("double", { format = "%f" ;  glib_type = "gdouble"; inttype = "double";  size = 8; value=Float 4.2 });
+  ("double", { format = "%f" ;  glib_type = "gdouble"; inttype = "double";  size = 8; value=Double 4.2 });
   ("char",   { format = "%c" ;  glib_type = "gchar"; inttype = "char";  size = 1; value=Char '*' });
   ("string", { format = "%s" ;  glib_type = "gchar*"; inttype = "char*";  size = max_int; value=String "42" })
 ]
@@ -143,7 +143,8 @@ let rec value = fun t v ->
       Scalar ("uint8" | "uint16" | "int8" | "int16") -> Int (int_of_string v)
     | Scalar ("uint32" | "int32") -> Int32 (Int32.of_string v)
     | Scalar ("uint64" | "int64") -> Int64 (Int64.of_string v)
-    | Scalar ("float" | "double") -> Float (float_of_string v)
+    | Scalar "float" -> Float (float_of_string v)
+    | Scalar "double" -> Double (float_of_string v)
     | Scalar "string" -> String v
     | Scalar "char" -> Char v.[0]
     | ArrayType t' ->
@@ -156,6 +157,7 @@ let rec value = fun t v ->
 let rec string_of_value = function
     Int x -> string_of_int x
   | Float x -> string_of_float x
+  | Double x -> string_of_float x
   | Int32 x -> Int32.to_string x
   | Int64 x -> Int64.to_string x
   | Char c -> String.make 1 c
@@ -169,6 +171,7 @@ let magic = fun x -> (Obj.magic x:('a,'b,'c) Pervasives.format)
 let formatted_string_of_value = fun format v ->
   match v with
       Float x -> sprintf (magic format) x
+    | Double x -> sprintf (magic format) x
     | v -> string_of_value v
 
 
@@ -277,6 +280,11 @@ let float_assoc = fun (a:string) vs ->
   match assoc a vs with
       Float x -> x
     | _ -> invalid_arg "Pprz.float_assoc"
+
+let double_assoc = fun (a:string) vs ->
+  match assoc a vs with
+      Double x -> x
+    | _ -> invalid_arg "Pprz.double_assoc"
 
 let int_of_value = fun value ->
   match value with
@@ -723,17 +731,17 @@ module MessagesOfXml(Class:CLASS_Xml) = struct
       | Some the_link_id -> begin
         let index = ref 0 in
         let modified_msg = String.copy msg in
-        let func = fun c -> 
-          match c with 
-            ' ' -> begin 
-            String.set modified_msg !index ';'; 
+        let func = fun c ->
+          match c with
+            ' ' -> begin
+            String.set modified_msg !index ';';
             index := !index + 1
             end
           | x -> index := !index + 1; in
         String.iter func modified_msg;
         Ivy.send ( Printf.sprintf "redlink TELEMETRY_MESSAGE %s %i %s" sender the_link_id modified_msg);
       end
-          
+
   let message_bind = fun ?sender msg_name cb ->
     match sender with
         None ->
