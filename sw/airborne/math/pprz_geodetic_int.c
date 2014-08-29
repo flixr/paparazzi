@@ -337,3 +337,39 @@ void ecef_of_lla_i(struct EcefCoor_i* out, struct LlaCoor_i* in) {
   out->z = (int32_t)CM_OF_M(out_d.z);
 
 }
+
+void high_res_rmat_bfp_of_real(struct Int32Mat33* ei, struct FloatMat33* ef) {
+  ei->m[0] = BFP_OF_REAL(ef->m[0], HIGH_RES_TRIG_FRAC);
+  ei->m[1] = BFP_OF_REAL(ef->m[1], HIGH_RES_TRIG_FRAC);
+  ei->m[2] = BFP_OF_REAL(ef->m[2], HIGH_RES_TRIG_FRAC);
+  ei->m[3] = BFP_OF_REAL(ef->m[3], HIGH_RES_TRIG_FRAC);
+  ei->m[4] = BFP_OF_REAL(ef->m[4], HIGH_RES_TRIG_FRAC);
+  ei->m[5] = BFP_OF_REAL(ef->m[5], HIGH_RES_TRIG_FRAC);
+  ei->m[6] = BFP_OF_REAL(ef->m[6], HIGH_RES_TRIG_FRAC);
+  ei->m[7] = BFP_OF_REAL(ef->m[7], HIGH_RES_TRIG_FRAC);
+  ei->m[8] = BFP_OF_REAL(ef->m[8], HIGH_RES_TRIG_FRAC);
+}
+
+void high_res_rmat_float_of_bfp(struct FloatMat33* ef, struct Int32Mat33* ei) {
+  ef->m[0] = FLOAT_OF_BFP(ei->m[0], HIGH_RES_TRIG_FRAC);
+  ef->m[1] = FLOAT_OF_BFP(ei->m[1], HIGH_RES_TRIG_FRAC);
+  ef->m[2] = FLOAT_OF_BFP(ei->m[2], HIGH_RES_TRIG_FRAC);
+  ef->m[3] = FLOAT_OF_BFP(ei->m[3], HIGH_RES_TRIG_FRAC);
+  ef->m[4] = FLOAT_OF_BFP(ei->m[4], HIGH_RES_TRIG_FRAC);
+  ef->m[5] = FLOAT_OF_BFP(ei->m[5], HIGH_RES_TRIG_FRAC);
+  ef->m[6] = FLOAT_OF_BFP(ei->m[6], HIGH_RES_TRIG_FRAC);
+  ef->m[7] = FLOAT_OF_BFP(ei->m[7], HIGH_RES_TRIG_FRAC);
+  ef->m[8] = FLOAT_OF_BFP(ei->m[8], HIGH_RES_TRIG_FRAC);
+}
+
+void high_res_rmat_double_of_bfp(struct DoubleMat33* ef, struct Int32Mat33* ei) {
+  ef->m[0] = DOUBLE_OF_BFP(ei->m[0], HIGH_RES_TRIG_FRAC);
+  ef->m[1] = DOUBLE_OF_BFP(ei->m[1], HIGH_RES_TRIG_FRAC);
+  ef->m[2] = DOUBLE_OF_BFP(ei->m[2], HIGH_RES_TRIG_FRAC);
+  ef->m[3] = DOUBLE_OF_BFP(ei->m[3], HIGH_RES_TRIG_FRAC);
+  ef->m[4] = DOUBLE_OF_BFP(ei->m[4], HIGH_RES_TRIG_FRAC);
+  ef->m[5] = DOUBLE_OF_BFP(ei->m[5], HIGH_RES_TRIG_FRAC);
+  ef->m[6] = DOUBLE_OF_BFP(ei->m[6], HIGH_RES_TRIG_FRAC);
+  ef->m[7] = DOUBLE_OF_BFP(ei->m[7], HIGH_RES_TRIG_FRAC);
+  ef->m[8] = DOUBLE_OF_BFP(ei->m[8], HIGH_RES_TRIG_FRAC);
+}

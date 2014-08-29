@@ -442,7 +442,7 @@ static inline void stateSetLocalOrigin_i(struct LtpDef_i* ltp_def) {
   /* convert to float */
   ECEF_FLOAT_OF_BFP(state.ned_origin_f.ecef, state.ned_origin_i.ecef);
   LLA_FLOAT_OF_BFP(state.ned_origin_f.lla, state.ned_origin_i.lla);
-  HIGH_RES_RMAT_FLOAT_OF_BFP(state.ned_origin_f.ltp_of_ecef, state.ned_origin_i.ltp_of_ecef);
+  high_res_rmat_float_of_bfp(&state.ned_origin_f.ltp_of_ecef, &state.ned_origin_i.ltp_of_ecef);
   state.ned_origin_f.hmsl = M_OF_MM(state.ned_origin_i.hmsl);
 
   /* clear bits for all local frame representations */

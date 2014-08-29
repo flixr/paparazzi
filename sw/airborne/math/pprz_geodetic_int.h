@@ -199,41 +199,12 @@ extern void ecef_of_ned_vect_i(struct EcefCoor_i* ecef, struct LtpDef_i* def, st
 
 #define INT32_VECT2_NED_OF_ENU(_o, _i) INT32_VECT2_ENU_OF_NED(_o,_i)
 
-#define HIGH_RES_RMAT_BFP_OF_REAL(_ei, _ef) {                 \
-    (_ei).m[0] = BFP_OF_REAL((_ef).m[0], HIGH_RES_TRIG_FRAC); \
-    (_ei).m[1] = BFP_OF_REAL((_ef).m[1], HIGH_RES_TRIG_FRAC); \
-    (_ei).m[2] = BFP_OF_REAL((_ef).m[2], HIGH_RES_TRIG_FRAC); \
-    (_ei).m[3] = BFP_OF_REAL((_ef).m[3], HIGH_RES_TRIG_FRAC); \
-    (_ei).m[4] = BFP_OF_REAL((_ef).m[4], HIGH_RES_TRIG_FRAC); \
-    (_ei).m[5] = BFP_OF_REAL((_ef).m[5], HIGH_RES_TRIG_FRAC); \
-    (_ei).m[6] = BFP_OF_REAL((_ef).m[6], HIGH_RES_TRIG_FRAC); \
-    (_ei).m[7] = BFP_OF_REAL((_ef).m[7], HIGH_RES_TRIG_FRAC); \
-    (_ei).m[8] = BFP_OF_REAL((_ef).m[8], HIGH_RES_TRIG_FRAC); \
-  }
 
-#define HIGH_RES_RMAT_FLOAT_OF_BFP(_ef, _ei) {                 \
-    (_ef).m[0] = FLOAT_OF_BFP((_ei).m[0], HIGH_RES_TRIG_FRAC); \
-    (_ef).m[1] = FLOAT_OF_BFP((_ei).m[1], HIGH_RES_TRIG_FRAC); \
-    (_ef).m[2] = FLOAT_OF_BFP((_ei).m[2], HIGH_RES_TRIG_FRAC); \
-    (_ef).m[3] = FLOAT_OF_BFP((_ei).m[3], HIGH_RES_TRIG_FRAC); \
-    (_ef).m[4] = FLOAT_OF_BFP((_ei).m[4], HIGH_RES_TRIG_FRAC); \
-    (_ef).m[5] = FLOAT_OF_BFP((_ei).m[5], HIGH_RES_TRIG_FRAC); \
-    (_ef).m[6] = FLOAT_OF_BFP((_ei).m[6], HIGH_RES_TRIG_FRAC); \
-    (_ef).m[7] = FLOAT_OF_BFP((_ei).m[7], HIGH_RES_TRIG_FRAC); \
-    (_ef).m[8] = FLOAT_OF_BFP((_ei).m[8], HIGH_RES_TRIG_FRAC); \
-  }
-
-#define HIGH_RES_RMAT_DOUBLE_OF_BFP(_ef, _ei) {                 \
-    (_ef).m[0] = DOUBLE_OF_BFP((_ei).m[0], HIGH_RES_TRIG_FRAC); \
-    (_ef).m[1] = DOUBLE_OF_BFP((_ei).m[1], HIGH_RES_TRIG_FRAC); \
-    (_ef).m[2] = DOUBLE_OF_BFP((_ei).m[2], HIGH_RES_TRIG_FRAC); \
-    (_ef).m[3] = DOUBLE_OF_BFP((_ei).m[3], HIGH_RES_TRIG_FRAC); \
-    (_ef).m[4] = DOUBLE_OF_BFP((_ei).m[4], HIGH_RES_TRIG_FRAC); \
-    (_ef).m[5] = DOUBLE_OF_BFP((_ei).m[5], HIGH_RES_TRIG_FRAC); \
-    (_ef).m[6] = DOUBLE_OF_BFP((_ei).m[6], HIGH_RES_TRIG_FRAC); \
-    (_ef).m[7] = DOUBLE_OF_BFP((_ei).m[7], HIGH_RES_TRIG_FRAC); \
-    (_ef).m[8] = DOUBLE_OF_BFP((_ei).m[8], HIGH_RES_TRIG_FRAC); \
-  }
+#include "math/pprz_algebra_float.h"
+#include "math/pprz_algebra_double.h"
+extern void high_res_rmat_bfp_of_real(struct Int32Mat33* ei, struct FloatMat33* ef);
+extern void high_res_rmat_float_of_bfp(struct FloatMat33* ef, struct Int32Mat33* ei);
+extern void high_res_rmat_double_of_bfp(struct DoubleMat33* ef, struct Int32Mat33* ei);
 
 #ifdef __cplusplus
 } /* extern "C" */
