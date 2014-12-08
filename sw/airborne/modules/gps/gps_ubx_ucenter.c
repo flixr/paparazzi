@@ -29,7 +29,9 @@
 
 #include "gps_ubx_ucenter.h"
 #include "subsystems/gps/gps_ubx.h"
+#if DOWNLINK
 #include "subsystems/datalink/downlink.h"
+#endif
 #include <stdio.h>
 
 #if PRINT_DEBUG_GPS_UBX_UCENTER
@@ -470,7 +472,7 @@ static bool_t gps_ubx_ucenter_configure(uint8_t nr)
     gps_ubx_ucenter.replies[3] = gps_ubx_ucenter.sw_ver_l;
     gps_ubx_ucenter.replies[4] = gps_ubx_ucenter.hw_ver_h;
     gps_ubx_ucenter.replies[5] = gps_ubx_ucenter.hw_ver_l;
-#if DEBUG_GPS_UBX_UCENTER
+#if DOWNLINK && DEBUG_GPS_UBX_UCENTER
     DOWNLINK_SEND_DEBUG(DefaultChannel, DefaultDevice,6,gps_ubx_ucenter.replies);
 #endif
     // Configure CFG-NAV(5) message

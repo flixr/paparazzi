@@ -199,7 +199,7 @@ void init_ap( void ) {
   ahrs_init();
 #endif
 
-#if USE_AHRS && USE_IMU
+#if USE_AHRS && USE_IMU && PERIODIC_TELEMETRY
   register_periodic_telemetry(DefaultPeriodic, "STATE_FILTER_STATUS", send_filter_status);
 #endif
 

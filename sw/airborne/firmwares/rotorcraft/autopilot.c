@@ -35,7 +35,6 @@
 #include "subsystems/actuators.h"
 #include "subsystems/electrical.h"
 #include "subsystems/settings.h"
-#include "subsystems/datalink/telemetry.h"
 #include "firmwares/rotorcraft/navigation.h"
 #include "firmwares/rotorcraft/guidance.h"
 
@@ -43,6 +42,10 @@
 #include "firmwares/rotorcraft/stabilization/stabilization_none.h"
 #include "firmwares/rotorcraft/stabilization/stabilization_rate.h"
 #include "firmwares/rotorcraft/stabilization/stabilization_attitude.h"
+
+#if PERIODIC_TELEMETRY
+#include "subsystems/datalink/telemetry.h"
+#endif
 
 #include "generated/settings.h"
 
@@ -138,6 +141,7 @@ PRINT_CONFIG_MSG("Enabled UNLOCKED_HOME_MODE since MODE_AUTO2 is AP_MODE_HOME")
 #endif
 #endif
 
+#if PERIODIC_TELEMETRY
 static void send_alive(struct transport_tx *trans, struct link_device *dev) {
   pprz_msg_send_ALIVE(trans, dev, AC_ID, 16, MD5SUM);
 }
@@ -235,7 +239,7 @@ static void send_rotorcraft_cmd(struct transport_tx *trans, struct link_device *
       &stabilization_cmd[COMMAND_YAW],
       &stabilization_cmd[COMMAND_THRUST]);
 }
-
+#endif // PERIODIC_TELEMTRY
 
 void autopilot_init(void) {
   /* mode is finally set at end of init if MODE_STARTUP is not KILL */
@@ -269,6 +273,7 @@ void autopilot_init(void) {
   /* set startup mode, propagates through to guidance h/v */
   autopilot_set_mode(MODE_STARTUP);
 
+#if PERIODIC_TELEMETRY
   register_periodic_telemetry(DefaultPeriodic, "ALIVE", send_alive);
   register_periodic_telemetry(DefaultPeriodic, "ROTORCRAFT_STATUS", send_status);
   register_periodic_telemetry(DefaultPeriodic, "ENERGY", send_energy);
@@ -281,6 +286,7 @@ void autopilot_init(void) {
 #ifdef RADIO_CONTROL
   register_periodic_telemetry(DefaultPeriodic, "RC", send_rc);
   register_periodic_telemetry(DefaultPeriodic, "ROTORCRAFT_RADIO_CONTROL", send_rotorcraft_rc);
+#endif
 #endif
 }
 

@@ -49,7 +49,11 @@ extern void infrared_i2c_ver_event( void );
   if (irv_trans.status == I2CTransSuccess) infrared_i2c_ver_event(); \
 }
 
+#if DOWNLINK
 #define infrared_i2cDownlink() DOWNLINK_SEND_DEBUG_IR_I2C(DefaultChannel, DefaultDevice, &ir_i2c.ir1, &ir_i2c.ir2, &ir_i2c.ir3)
+#else
+#define infrared_i2cDownlink() {}
+#endif
 
 #define infrared_i2c_SetConfWord(_v) { \
   ir_i2c_conf_hor_done = FALSE; \

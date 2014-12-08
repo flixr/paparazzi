@@ -154,6 +154,7 @@ void autopilot_init(void) {
   gpio_clear(POWER_SWITCH_GPIO);
 #endif
 
+#if PERIODIC_TELEMETRY
   /* register some periodic message */
   register_periodic_telemetry(DefaultPeriodic, "ALIVE", send_alive);
   register_periodic_telemetry(DefaultPeriodic, "PPRZ_MODE", send_mode);
@@ -166,6 +167,7 @@ void autopilot_init(void) {
   register_periodic_telemetry(DefaultPeriodic, "DESIRED", send_desired);
 #if defined RADIO_CALIB && defined RADIO_CONTROL_SETTINGS
   register_periodic_telemetry(DefaultPeriodic, "RC_SETTINGS", send_rc_settings);
+#endif
 #endif
 }
 

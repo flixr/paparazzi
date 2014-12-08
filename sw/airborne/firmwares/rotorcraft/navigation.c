@@ -44,9 +44,11 @@
 
 #include "math/pprz_algebra_int.h"
 
+#if DOWNLINK
 #include "subsystems/datalink/downlink.h"
 #include "messages.h"
 #include "mcu_periph/uart.h"
+#endif
 
 const uint8_t nb_waypoint = NB_WAYPOINT;
 struct EnuCoor_i waypoints[NB_WAYPOINT];
@@ -419,8 +421,10 @@ void nav_move_waypoint_lla(uint8_t wp_id, struct LlaCoor_i* new_lla_pos) {
 void nav_move_waypoint(uint8_t wp_id, struct EnuCoor_i * new_pos) {
   if (wp_id < nb_waypoint) {
     VECT3_COPY(waypoints[wp_id],(*new_pos));
+#if DOWNLINK
     DOWNLINK_SEND_WP_MOVED_ENU(DefaultChannel, DefaultDevice, &wp_id, &(new_pos->x),
                                &(new_pos->y), &(new_pos->z));
+#endif
   }
 }
 
@@ -441,7 +445,9 @@ void navigation_update_wp_from_speed(uint8_t wp, struct Int16Vect3 speed_sp, int
   nav_heading += delta_heading;
 
   INT32_COURSE_NORMALIZE(nav_heading);
+#if DOWNLINK
   RunOnceEvery(10,DOWNLINK_SEND_WP_MOVED_ENU(DefaultChannel, DefaultDevice, &wp, &(waypoints[wp].x), &(waypoints[wp].y), &(waypoints[wp].z)));
+#endif
 }
 
 bool_t nav_detect_ground(void) {

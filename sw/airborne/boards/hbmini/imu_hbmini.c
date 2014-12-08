@@ -88,9 +88,11 @@ void imu_periodic( void )
 
 void imu_hbmini_downlink_raw( void )
 {
+#if DOWNLINK
   DOWNLINK_SEND_IMU_GYRO_RAW(DefaultChannel, DefaultDevice,&imu.gyro_unscaled.p,&imu.gyro_unscaled.q,&imu.gyro_unscaled.r);
   DOWNLINK_SEND_IMU_ACCEL_RAW(DefaultChannel, DefaultDevice,&imu.accel_unscaled.x,&imu.accel_unscaled.y,&imu.accel_unscaled.z);
   DOWNLINK_SEND_IMU_MAG_RAW(DefaultChannel, DefaultDevice,&imu.mag_unscaled.x,&imu.mag_unscaled.y,&imu.mag_unscaled.z);
+#endif
 }
 
 void imu_hbmini_event( void )

@@ -58,9 +58,11 @@ void init_sysmon(void) {
   periodic_timer = 0;
 }
 
+#if DOWNLINK
 #include "mcu_periph/uart.h"
 #include "messages.h"
 #include "subsystems/datalink/downlink.h"
+#endif
 
 void periodic_report_sysmon(void) {
   /** Report system status at low frequency */
@@ -70,11 +72,13 @@ void periodic_report_sysmon(void) {
     sys_mon.cpu_load = 100 * sys_mon.periodic_cycle / sys_mon.periodic_time;
     sys_mon.event_number = sum_n_event / n_periodic;
 
+#if DOWNLINK
     DOWNLINK_SEND_SYS_MON(DefaultChannel, DefaultDevice, &sys_mon.periodic_time,
                           &sys_mon.periodic_time_min, &sys_mon.periodic_time_max,
                           &sys_mon.periodic_cycle, &sys_mon.periodic_cycle_min,
                           &sys_mon.periodic_cycle_max, &sys_mon.event_number,
                           &sys_mon.cpu_load);
+#endif
   }
 
   n_periodic = 0;

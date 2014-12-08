@@ -35,9 +35,11 @@
 #include "std.h"
 #include "subsystems/abi.h"
 
+#if DOWNLINK
 #include "mcu_periph/uart.h"
 #include "messages.h"
 #include "subsystems/datalink/downlink.h"
+#endif
 
 #ifdef BARO_PERIODIC_FREQUENCY
 #if BARO_PERIODIC_FREQUENCY > 100
@@ -63,7 +65,7 @@ void baro_periodic(void) {
     /* call the convenience periodic that initializes the sensor and starts reading*/
     ms5611_spi_periodic(&bb_ms5611);
 
-#if DEBUG
+#if DOWNLINK && DEBUG
     if (bb_ms5611.initialized)
       RunOnceEvery((50*30),  DOWNLINK_SEND_MS5611_COEFF(DefaultChannel, DefaultDevice,
                                                         &bb_ms5611.data.c[0],
@@ -93,7 +95,7 @@ void baro_event(void) {
       RunOnceEvery(10,LED_TOGGLE(BARO_LED));
 #endif
 
-#if DEBUG
+#if DOWNLINK && DEBUG
       float fbaroms = bb_ms5611.data.pressure / 100.;
       DOWNLINK_SEND_BARO_MS5611(DefaultChannel, DefaultDevice,
                                 &bb_ms5611.data.d1, &bb_ms5611.data.d2,

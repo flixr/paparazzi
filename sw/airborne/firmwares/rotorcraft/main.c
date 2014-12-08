@@ -40,9 +40,10 @@
 #endif
 #include "led.h"
 
+#if PERIODIC_TELEMETRY
 #include "subsystems/datalink/telemetry.h"
+#endif
 #include "subsystems/datalink/datalink.h"
-#include "subsystems/datalink/downlink.h"
 #include "subsystems/settings.h"
 
 #include "subsystems/commands.h"
@@ -124,7 +125,9 @@ tid_t modules_tid;       ///< id for modules_periodic_task() timer
 tid_t failsafe_tid;      ///< id for failsafe_check() timer
 tid_t radio_control_tid; ///< id for radio_control_periodic_task() timer
 tid_t electrical_tid;    ///< id for electrical_periodic() timer
+#if PERIODIC_TELEMETRY
 tid_t telemetry_tid;     ///< id for telemetry_periodic() timer
+#endif
 #if USE_BARO_BOARD
 tid_t baro_tid;          ///< id for baro_periodic() timer
 #endif
@@ -186,7 +189,9 @@ STATIC_INLINE void main_init( void ) {
   radio_control_tid = sys_time_register_timer((1./60.), NULL);
   failsafe_tid = sys_time_register_timer(0.05, NULL);
   electrical_tid = sys_time_register_timer(0.1, NULL);
+#if PERIODIC_TELEMETRY
   telemetry_tid = sys_time_register_timer((1./TELEMETRY_FREQUENCY), NULL);
+#endif
 #if USE_BARO_BOARD
   baro_tid = sys_time_register_timer(1./BARO_PERIODIC_FREQUENCY, NULL);
 #endif
@@ -203,8 +208,10 @@ STATIC_INLINE void handle_periodic_tasks( void ) {
     failsafe_check();
   if (sys_time_check_and_ack_timer(electrical_tid))
     electrical_periodic();
+#if PERIODIC_TELEMETRY
   if (sys_time_check_and_ack_timer(telemetry_tid))
     telemetry_periodic();
+#endif
 #if USE_BARO_BOARD
   if (sys_time_check_and_ack_timer(baro_tid))
     baro_periodic();
@@ -232,11 +239,11 @@ STATIC_INLINE void main_periodic( void ) {
   RunOnceEvery(10, LED_PERIODIC());
 }
 
-STATIC_INLINE void telemetry_periodic(void) {
 #if PERIODIC_TELEMETRY
+STATIC_INLINE void telemetry_periodic(void) {
   periodic_telemetry_send_Main(&(DefaultChannel).trans_tx, &(DefaultDevice).device);
-#endif
 }
+#endif
 
 /** mode to enter when RC is lost while using a mode with RC input (not AP_MODE_NAV) */
 #ifndef RC_LOST_MODE

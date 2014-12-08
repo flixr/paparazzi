@@ -278,7 +278,7 @@ void ahrs_update_mag(float dt __attribute__((unused)))
   ltp_mag.x = MAG_Heading_X;
   ltp_mag.y = MAG_Heading_Y;
 
-#if FLOAT_DCM_SEND_DEBUG
+#if DOWNLINK && FLOAT_DCM_SEND_DEBUG
   // Downlink
   RunOnceEvery(10,DOWNLINK_SEND_IMU_MAG(DefaultChannel, DefaultDevice, &ltp_mag.x, &ltp_mag.y, &ltp_mag.z));
 #endif
