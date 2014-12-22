@@ -814,6 +814,18 @@ let () =
     else
       None in
 
+  (** quit and cleanly shut down (write log) *)
+  let quit = fun _ ->
+    match logging with
+      Some log ->
+        close_out log;
+        printf "Logging: saved data to file\n"; flush stdout; exit 0
+    | None -> exit 0
+  in
+
+  Sys.set_signal Sys.sigint (Sys.Signal_handle quit);
+  Sys.set_signal Sys.sigterm (Sys.Signal_handle quit);
+
   (* Waits for new aircrafts *)
   listen_acs logging;
 
