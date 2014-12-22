@@ -131,6 +131,7 @@ let logger = fun () ->
       Str.replace_first (Str.regexp "[ \n]+$") "" (read_process (Env.paparazzi_src ^ "/paparazzi_version"))
     with _ -> "UNKNOWN" in
   output_string f ("<!-- logged with runtime paparazzi_version " ^ version_str ^ " -->\n");
+  (*printf "runtime paparazzi_version: %s\n" version_str; flush stdout;*)
   let build_str =
     try
       let f = open_in (Env.paparazzi_home ^ "/var/build_version.txt") in
@@ -139,8 +140,10 @@ let logger = fun () ->
       s
     with _ -> "UNKNOWN" in
   output_string f ("<!-- logged with build paparazzi_version " ^ build_str ^ " -->\n");
+  (*printf "build paparazzi_version: %s\n" build_str; flush stdout;*)
   output_string f (Xml.to_string_fmt (log_xml start_time data_name));
   close_out f;
+  printf "Logging: saved config to file: %s\n" (logs_path // log_name); flush stdout;
   open_out (logs_path // data_name)
 
 
