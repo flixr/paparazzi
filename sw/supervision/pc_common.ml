@@ -128,17 +128,19 @@ let run_and_monitor = fun ?(once = false) ?file gui log com_name com args ->
   let rec callback = fun stop ->
     match p#button_stop#label, stop with
         "gtk-stop", _ ->
-          List.iter Glib.Io.remove !watches;
-          close_in !outchan;
-          ignore (Unix.kill !pid Sys.sigkill);
-          begin match Unix.waitpid [] !pid with
+          ignore (Unix.kill !pid Sys.sigterm);
+          ignore (Glib.Timeout.add 100 (fun () ->
+            begin match Unix.waitpid [] !pid with
             | (x, Unix.WEXITED 0) ->
               log (sprintf "\nDONE '%s'\n\n" com);
             | (x, Unix.WEXITED i) ->
               log (sprintf "\nFAILED '%s' with code %i\n\n" com i);
             | (x, _) ->
               log (sprintf "\nSTOPPED '%s'\n\n" com);
-          end;
+            end;
+            close_in !outchan;
+            List.iter Glib.Io.remove !watches;
+            false));
           p#button_stop#set_label "gtk-redo";
           p#button_remove#misc#set_sensitive true;
           if once then
