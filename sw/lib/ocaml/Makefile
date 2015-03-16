@@ -50,6 +50,9 @@ LABLGTK2GNOMECANVAS = $(shell ocamlfind query -p-format lablgtk2.gnomecanvas 2>/
 METAFILE = META.pprz.osx
 endif
 
+NETCLIENT_VER = $(shell ocamlfind query -format '%v' netclient)
+CPPO_OPTS=-pp "cppo -V NETCLIENT:$(NETCLIENT_VER)"
+
 INCLUDES=
 PKGCOMMON=xml-light,netclient,glibivy,lablgtk2
 XINCLUDES=
@@ -127,11 +130,11 @@ caml_from_c_example : cserial.o convert.o caml_from_c_example.o camltm.o
 
 %.cmo : %.ml
 	@echo OC $<
-	$(Q)$(OCAMLC) $(INCLUDES) -package $(PKGCOMMON) -c $<
+	$(Q)$(OCAMLC) $(INCLUDES) $(CPPO_OPTS) -package $(PKGCOMMON) -c $<
 
 %.cmx : %.ml
 	@echo OOC $<
-	$(Q)$(OCAMLOPT) $(INCLUDES) -package $(PKGCOMMON) -c $<
+	$(Q)$(OCAMLOPT) $(INCLUDES) $(CPPO_OPTS) -package $(PKGCOMMON) -c $<
 
 %.cmi : %.mli
 	@echo OC $<
@@ -188,7 +191,7 @@ clean :
 
 .depend: Makefile $(GEN_DEP)
 	@echo DEPEND $@
-	$(Q)$(OCAMLDEP) *.ml* > .depend
+	$(Q)$(OCAMLDEP) $(CPPO_OPTS) *.ml* > .depend
 
 ifneq ($(MAKECMDGOALS),clean)
 -include .depend
