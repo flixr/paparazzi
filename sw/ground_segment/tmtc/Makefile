@@ -30,9 +30,9 @@ VAR = ../../../var
 
 INCLUDES= -I ../multimon
 PKG = -package glibivy,pprz
-LINKPKG = $(PKG) -linkpkg -dllpath-pkg pprz
+LINKPKG = $(PKG) -linkpkg
 XPKG = -package pprz.xlib
-XLINKPKG = $(XPKG) -linkpkg -dllpath-pkg pprz.xlib
+XLINKPKG = $(XPKG) -linkpkg
 
 LIBMULTIMONCMA=../multimon/multimon.cma
 LIBMULTIMONDLL= multimon.cma -dllpath $(PAPARAZZI_SRC)/sw/ground_segment/multimon
@@ -48,58 +48,58 @@ opt: server.opt
 clean:
 	$(Q)rm -f link server messages settings dia diadec *.bak *~ core *.o .depend *.opt *.out *.cm* ivy_tcp_aircraft ivy_tcp_controller broadcaster ivy2udp ivy_serial_bridge app_server gpsd2ivy c_ivy_client_example_1 c_ivy_client_example_2 c_ivy_client_example_3 ivy2nmea
 
-messages : messages.cmo $(LIBPPRZCMA)
+messages : messages.cmo
 	@echo OL $@
 	$(Q)$(OCAMLC) $(INCLUDES) -o $@ $(LINKPKG) gtkInit.cmo $<
 
-settings : settings.cmo ../cockpit/page_settings.cmo $(LIBPPRZCMA)
+settings : settings.cmo ../cockpit/page_settings.cmo
 	@echo OL $@
 	$(Q)$(OCAMLC) $(INCLUDES) -o $@ $(XLINKPKG) gtkInit.cmo -I ../cockpit gtk_save_settings.cmo saveSettings.cmo page_settings.cmo $<
 
-server : $(SERVERCMO) $(LIBPPRZCMA)
+server : $(SERVERCMO)
 	@echo OL $@
 	$(Q)$(OCAMLC) $(INCLUDES) -o $@ $(LINKPKG) $(SERVERCMO)
 
-server.opt :  $(SERVERCMX) $(LIBPPRZCMXA)
+server.opt :  $(SERVERCMX)
 	@echo OOL $@
 	$(Q)$(OCAMLOPT) $(INCLUDES) -o $@ -package glibivy,pprz -linkpkg $(SERVERCMX)
 
-link : link.cmo $(LIBMULTIMONCMA) $(LIBPPRZCMA)
+link : link.cmo $(LIBMULTIMONCMA)
 	@echo OL $@
 	$(Q)$(OCAMLC) $(INCLUDES) -o $@ $(LINKPKG) $(LIBMULTIMONDLL) $<
 
 
-ivy_tcp_aircraft : ivy_tcp_aircraft.cmo  $(LIBMULTIMONCMA) $(LIBPPRZCMA)
+ivy_tcp_aircraft : ivy_tcp_aircraft.cmo  $(LIBMULTIMONCMA)
 	@echo OL $@
 	$(Q)$(OCAMLC) $(INCLUDES) -o $@ $(LINKPKG) $(LIBMULTIMONDLL) $<
 
 
-ivy_tcp_controller : ivy_tcp_controller.cmo  $(LIBMULTIMONCMA) $(LIBPPRZCMA)
+ivy_tcp_controller : ivy_tcp_controller.cmo  $(LIBMULTIMONCMA)
 	@echo OL $@
 	$(Q)$(OCAMLC) $(INCLUDES) -o $@ $(LINKPKG) $(LIBMULTIMONDLL) $<
 
 
-broadcaster : broadcaster.cmo $(LIBMULTIMONCMA) $(LIBPPRZCMA)
+broadcaster : broadcaster.cmo $(LIBMULTIMONCMA)
 	@echo OL $@
 	$(Q)$(OCAMLC) $(INCLUDES) -o $@ $(LINKPKG) $(LIBMULTIMONDLL) $<
 
 
-ivy2udp : ivy2udp.cmo $(LIBPPRZCMA)
+ivy2udp : ivy2udp.cmo
 	@echo OL $@
 	$(Q)$(OCAMLC) $(INCLUDES) -o $@ $(LINKPKG) $<
 
 
-dia : dia.cmo $(LIBMULTIMONCMA) $(LIBPPRZCMA)
+dia : dia.cmo $(LIBMULTIMONCMA)
 	@echo OL $@
 	$(Q)$(OCAMLC) $(INCLUDES) -o $@ $(LINKPKG) $(LIBMULTIMONDLL) $<
 
 
-diadec : diadec.cmo $(LIBMULTIMONCMA) $(LIBPPRZCMA)
+diadec : diadec.cmo $(LIBMULTIMONCMA)
 	@echo OL $@
 	$(Q)$(OCAMLC) $(INCLUDES) -o $@ $(LINKPKG) $(LIBMULTIMONDLL) $<
 
 
-150m : 150m.cmo $(LIBPPRZCMA)
+150m : 150m.cmo
 	@echo OL $@
 	$(Q)$(OCAMLC) $(INCLUDES) -o $@ $(LINKPKG) gtkInit.cmo $<
 

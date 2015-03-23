@@ -53,15 +53,16 @@ endif
 INSTALL_FILES = $(shell ls $(BUILDDIR)/*.so $(BUILDDIR)/*.a $(BUILDDIR)/*.mli $(BUILDDIR)/*.cm*)
 
 
-all: byte native
+all: static native
 
+# bytecode with dynamically linked libs
 byte: gen_papget_editors _tags META
 	@echo Build bytecode lib
 	$(Q)test -d $(BUILDDIR) || mkdir -p $(BUILDDIR)
 	$(Q)$(OCAMLBUILD) -build-dir $(BUILDDIR) lib-pprz.cma xlib-pprz.cma
 	$(Q)cp META $(BUILDDIR)
 
-# byte with statically linked libs
+# bytecode with statically linked libs
 static: gen_papget_editors _tags META
 	@echo Build bytecode lib with static linking
 	$(Q)test -d $(BUILDDIR) || mkdir -p $(BUILDDIR)
@@ -74,7 +75,7 @@ native: gen_papget_editors _tags META
 	$(Q)$(OCAMLBUILD) -build-dir $(BUILDDIR) lib-pprz.cmxa xlib-pprz.cmxa
 	$(Q)cp META $(BUILDDIR)
 
-install: byte native META
+install: all
 	@echo INSTALL
 	$(Q)ocamlfind install $(INSTALL_FLAGS) pprz META $(INSTALL_FILES)
 

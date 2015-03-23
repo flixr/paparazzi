@@ -29,7 +29,7 @@ include ../Makefile.ocaml
 OCAMLC += -g
 INCLUDES =
 PKG = -package glibivy,pprz
-LINKPKG = $(PKG) -linkpkg -dllpath-pkg pprz
+LINKPKG = $(PKG) -linkpkg
 
 SIMML = stdlib.ml data.ml flightModel.ml gps.ml
 SIMHML = $(SIMML) hitl.ml sim.ml
@@ -51,19 +51,19 @@ fg.so : fg.o
 	@echo BUILD $@
 	$(Q)$(CC) -shared -o $@ $^
 
-simhitl : fg.so $(SIMHCMO) simhitl.cmo $(LIBPPRZCMA)
+simhitl : fg.so $(SIMHCMO) simhitl.cmo
 	@echo OL $@
 	$(Q)$(OCAMLC) $(INCLUDES) -o $@ $(LINKPKG) gtkInit.cmo $<
 
-sitl.cma : fg.o $(SIMSCMO) $(LIBPPRZCMA)
+sitl.cma : fg.o $(SIMSCMO)
 	@echo OL $@
 	$(Q)$(OCAMLMKLIB) -o sitl $^
 
-sitl.cmxa : $(SIMSCMX) $(LIBPPRZCMXA)
+sitl.cmxa : $(SIMSCMX)
 	@echo OC $@
 	$(Q)$(OCAMLOPT) -o $@ -a $^
 
-gaia : gaia.cmo $(LIBPPRZCMA)
+gaia : gaia.cmo
 	@echo OL $@
 	$(Q)$(OCAMLC) $(INCLUDES) -o $@ $(LINKPKG) gtkInit.cmo $<
 

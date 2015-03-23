@@ -28,12 +28,12 @@ include ../Makefile.ocaml
 
 INCLUDES =
 PKG = -package pprz
-LINKPKG = $(PKG) -linkpkg -dllpath-pkg pprz
+LINKPKG = $(PKG) -linkpkg
 
 all: find_free_msg_id.out mergelogs
 
 
-%.out : %.ml $(LIBPPRZCMA)
+%.out : %.ml
 	@echo OL $<
 	$(Q)$(OCAMLC) $(INCLUDES) -o $@ $(LINKPKG) $<
 

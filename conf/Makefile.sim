@@ -33,7 +33,7 @@ CC = gcc
 SIMDIR = $(PAPARAZZI_SRC)/sw/simulator
 CAMLINCLUDES = -I $(LIBPPRZDIR) -I $(SIMDIR) -I $(OBJDIR)
 PKG = -package glibivy,pprz
-LINKPKG = $(PKG) -linkpkg -dllpath-pkg pprz
+LINKPKG = $(PKG) -linkpkg
 SIMSITLML = $(OBJDIR)/simsitl.ml
 SITLCMA = $(SIMDIR)/sitl.cma
 OPT ?= 2
@@ -59,23 +59,6 @@ CFLAGS += $(shell pkg-config --cflags-only-I ivy-glib)
 
 LDFLAGS		=	-lm
 
-# build sim in custom mode for Darwin and ARM systems for now...
-UNAME = $(shell uname -s)
-ifeq ($(UNAME),Darwin)
-SIMSITLCUSTOM=TRUE
-endif
-
-MNAME = $(shell uname -m)
-ifneq (,$(findstring arm,$(MNAME)))
-SIMSITLCUSTOM=TRUE
-endif
-
-ifdef SIMSITLCUSTOM
-	CAMLINCLUDES += $(shell ocamlfind query -r -i-format lablgtk2) $(shell ocamlfind query -r -i-format xml-light) $(shell ocamlfind query -r -i-format glibivy)
-	CAMLCMAS = unix.cma str.cma xml-light.cma glibivy-ocaml.cma lib-pprz.cma lablgtk.cma
-endif
-
-
 #
 # General rules
 #
@@ -91,20 +74,14 @@ $(OBJDIR):
 	@test -d $(OBJDIR) || mkdir -p $(OBJDIR)
 
 # shared library of the C autopilot part
+# not used with custom/static linking
 autopilot.so : $($(TARGET).objs)
 	@echo BUILD $@
 	$(Q)$(CC) -shared -o $(OBJDIR)/$@ $^
 
-ifdef SIMSITLCUSTOM
 $(OBJDIR)/simsitl : $($(TARGET).objs) $(SITLCMA) $(SIMSITLML)
 	@echo LD $@
-	$(Q)$(OCAMLC) -g -custom $(CAMLINCLUDES) -o $@ $(CAMLCMAS) $^
-else
-$(OBJDIR)/simsitl : autopilot.so $(SITLCMA) $(SIMSITLML)
-	@echo LD $@
-	$(Q)$(OCAMLC) -g $(CAMLINCLUDES) -o $@ $(LINKPKG) $^ -dllpath $(OBJDIR) -dllpath $(SIMDIR)
-endif
-
+	$(Q)$(OCAMLC) -g -custom $(CAMLINCLUDES) -o $@ $(LINKPKG) $^
 
 # The id of the A/C is hardcoded in the code (to be improved with dynlink ?)
 $(SIMSITLML) : $(SIMDIR)/simsitl.ml

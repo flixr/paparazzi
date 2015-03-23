@@ -39,13 +39,13 @@ endif
 
 INCLUDES =
 XPKG = -package pprz.xlib,$(LABLGTK2GNOMEUI)
-XLINKPKG = $(XPKG) -linkpkg -dllpath-pkg pprz.xlib
+XLINKPKG = $(XPKG) -linkpkg
 
 PAPARAZZICENTERCMO = gtk_pc.cmo gtk_process.cmo pc_common.cmo pc_control_panel.cmo pc_aircraft.cmo paparazzicenter.cmo
 
 all: paparazzicenter
 
-paparazzicenter : $(PAPARAZZICENTERCMO) $(LIBPPRZCMA) $(XLIBPPRZCMA)
+paparazzicenter : $(PAPARAZZICENTERCMO)
 	@echo OL $@
 	$(Q)$(OCAMLC) $(INCLUDES) -o $@ $(XLINKPKG) gtkInit.cmo $^
 

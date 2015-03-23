@@ -29,7 +29,7 @@ include ../../Makefile.ocaml
 CC = gcc
 
 PKG = -package pprz,glibivy
-LINKPKG = $(PKG) -linkpkg -dllpath-pkg pprz
+LINKPKG = $(PKG) -linkpkg
 
 GLIB_CFLAGS  = -Wall -fPIC $(shell pkg-config glib-2.0 --cflags)
 GLIB_LDFLAGS = $(shell pkg-config glib-2.0 --libs)
@@ -45,7 +45,6 @@ SDL_LDFLAGS = $(shell sdl-config --libs)
 
 # apparently on OSX `sdl-config --libs` also has -lSDLmain which we don't want
 ML_SDL_LFLAGS = $(foreach u,$(SDL_LDIRS),-ccopt $(u)) $(foreach u,$(SDL_LIBS),-cclib $(u)) libSDL.so
-ML_SDL_LFLAGS += -dllpath ${PAPARAZZI_SRC}/sw/ground_segment/joystick
 INCLUDES += -I $(shell ocamlc -where)
 
 SDL_STICK_DEPS = sdl_stick.o ml_sdl_stick.o
@@ -53,19 +52,7 @@ SDL_STICK_DEPS = sdl_stick.o ml_sdl_stick.o
 UNAME = $(shell uname -s)
 MNAME = $(shell uname -m)
 
-ifeq ($(UNAME),Darwin)
-	ML_SDL_OCAMLFLAGS = -custom
-	INPUT2IVY_DEPS = $(SDL_STICK_DEPS) input2ivy.cmo
-else
-# on ARM also link in custom mode for now...
-	ifneq (,$(findstring arm,$(MNAME)))
-		ML_SDL_OCAMLFLAGS = -custom
-		INPUT2IVY_DEPS = $(SDL_STICK_DEPS) input2ivy.cmo
-	else
-		ML_SDL_OCAMLFLAGS =
-		INPUT2IVY_DEPS = sdl_stick.so input2ivy.cmo
-	endif
-endif
+INPUT2IVY_DEPS = $(SDL_STICK_DEPS) input2ivy.cmo
 
 all: test_stick input2ivy
 
@@ -73,9 +60,9 @@ test_stick: test_sdl_stick.o
 	@echo BUILD $@
 	$(Q)$(CC) -g -O2 -DSTICK_DBG $(GLIB_CFLAGS) -o $@ $^ sdl_stick.c $(GLIB_LDFLAGS) $(SDL_LDFLAGS)
 
-input2ivy: $(LIBPPRZCMA) $(INPUT2IVY_DEPS)
+input2ivy: $(INPUT2IVY_DEPS)
 	@echo OL $@
-	$(Q)$(OCAMLC) -o $@ $(LINKPKG) $^ $(ML_SDL_OCAMLFLAGS) $(ML_SDL_LFLAGS)
+	$(Q)$(OCAMLC) -o $@ $(LINKPKG) -custom $^ $(ML_SDL_LFLAGS)
 
 
 sdl_stick.so : $(SDL_STICK_DEPS)
