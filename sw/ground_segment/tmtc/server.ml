@@ -358,107 +358,114 @@ let send_moved_waypoints = fun a ->
 let send_aircraft_msg = fun ac ->
   try
     let a = Hashtbl.find aircrafts ac in
-    let f = fun x -> Pprz.Float x in
-    let wgs84 = try a.pos with _ -> LL.make_geo 0. 0. in
-    let values = ["ac_id", Pprz.String ac;
-                  "roll", f (Geometry_2d.rad2deg a.roll);
-                  "pitch", f (Geometry_2d.rad2deg a.pitch);
-                  "heading", f (Geometry_2d.rad2deg a.heading);
-                  "lat", f ((Rad>>Deg)wgs84.posn_lat);
-                  "long", f ((Rad>>Deg) wgs84.posn_long);
-                  "unix_time", f a.unix_time;
-                  "itow", Pprz.Int64 a.itow;
-                  "speed", f a.gspeed;
-                  "airspeed", f a.airspeed; (* negative value is sent if no airspeed available *)
-                  "course", f (Geometry_2d.rad2deg a.course);
-                  "alt", f a.alt;
-                  "agl", f a.agl;
-                  "climb", f a.climb] in
-    Ground_Pprz.message_send my_id "FLIGHT_PARAM" values;
+
+    let time_since_last_msg = (U.gettimeofday () -. a.last_msg_date) in
+    if time_since_last_msg < 5. then
+      begin
+
+        let f = fun x -> Pprz.Float x in
+        let wgs84 = try a.pos with _ -> LL.make_geo 0. 0. in
+        let values = ["ac_id", Pprz.String ac;
+                      "roll", f (Geometry_2d.rad2deg a.roll);
+                      "pitch", f (Geometry_2d.rad2deg a.pitch);
+                      "heading", f (Geometry_2d.rad2deg a.heading);
+                      "lat", f ((Rad>>Deg)wgs84.posn_lat);
+                      "long", f ((Rad>>Deg) wgs84.posn_long);
+                      "unix_time", f a.unix_time;
+                      "itow", Pprz.Int64 a.itow;
+                      "speed", f a.gspeed;
+                      "airspeed", f a.airspeed; (* negative value is sent if no airspeed available *)
+                      "course", f (Geometry_2d.rad2deg a.course);
+                      "alt", f a.alt;
+                      "agl", f a.agl;
+                      "climb", f a.climb] in
+        Ground_Pprz.message_send my_id "FLIGHT_PARAM" values;
 
     (** send ACINFO messages if more than one A/C registered *)
-    if Hashtbl.length aircrafts > 1 then
-      begin
-        let cm_of_m_32 = fun f -> Pprz.Int32 (Int32.of_int (truncate (100. *. f))) in
-        let cm_of_m = fun f -> Pprz.Int (truncate (100. *. f)) in
-        let pos = LL.utm_of WGS84 a.pos in
-        let ac_info = ["ac_id", Pprz.String ac;
-                       "utm_east", cm_of_m_32 pos.utm_x;
-                       "utm_north", cm_of_m_32 pos.utm_y;
-                       "course", Pprz.Int (truncate (10. *. (Geometry_2d.rad2deg a.course)));
-                       "alt", cm_of_m_32 a.alt;
-                       "speed", cm_of_m a.gspeed;
-                       "climb", cm_of_m a.climb;
-                       "itow", Pprz.Int64 a.itow] in
-        Dl_Pprz.message_send my_id "ACINFO" ac_info;
+        if Hashtbl.length aircrafts > 1 then
+          begin
+            let cm_of_m_32 = fun f -> Pprz.Int32 (Int32.of_int (truncate (100. *. f))) in
+            let cm_of_m = fun f -> Pprz.Int (truncate (100. *. f)) in
+            let pos = LL.utm_of WGS84 a.pos in
+            let ac_info = ["ac_id", Pprz.String ac;
+                           "utm_east", cm_of_m_32 pos.utm_x;
+                           "utm_north", cm_of_m_32 pos.utm_y;
+                           "course", Pprz.Int (truncate (10. *. (Geometry_2d.rad2deg a.course)));
+                           "alt", cm_of_m_32 a.alt;
+                           "speed", cm_of_m a.gspeed;
+                           "climb", cm_of_m a.climb;
+                           "itow", Pprz.Int64 a.itow] in
+            Dl_Pprz.message_send my_id "ACINFO" ac_info;
+          end;
+
+        if !Kml.enabled then
+          Kml.update_ac a;
+
+        begin
+          match a.nav_ref with
+            Some nav_ref ->
+              let values = ["ac_id", Pprz.String ac;
+                            "cur_block", Pprz.Int a.cur_block;
+                            "cur_stage", Pprz.Int a.cur_stage;
+                            "stage_time", Pprz.Int64 (Int64.of_int a.stage_time);
+                            "block_time", Pprz.Int64 (Int64.of_int a.block_time);
+                            "target_lat", f ((Rad>>Deg)a.desired_pos.posn_lat);
+                            "target_long", f ((Rad>>Deg)a.desired_pos.posn_long);
+                            "target_alt", Pprz.Float a.desired_altitude;
+                            "target_climb", Pprz.Float a.desired_climb;
+                            "target_course", Pprz.Float ((Rad>>Deg)a.desired_course);
+                            "dist_to_wp", Pprz.Float a.dist_to_wp
+                           ] in
+              Ground_Pprz.message_send my_id "NAV_STATUS" values
+          | None -> () (* No nav_ref yet *)
+        end;
+
+        let values = ["ac_id", Pprz.String ac;
+                      "throttle", f a.throttle;
+                      "throttle_accu", f a.throttle_accu;
+                      "rpm", f a.rpm;
+                      "temp", f a.temp;
+                      "bat", f a.bat;
+                      "amp", f a.amp;
+                      "energy", Pprz.Int a.energy] in
+        Ground_Pprz.message_send my_id "ENGINE_STATUS" values;
+
+        let ap_mode = get_indexed_value (modes_of_type a.vehicle_type) a.ap_mode in
+        let gaz_mode = get_indexed_value gaz_modes a.gaz_mode in
+        let lat_mode = get_indexed_value lat_modes a.lateral_mode in
+        let horiz_mode = get_indexed_value horiz_modes a.horizontal_mode in
+        let gps_mode = get_indexed_value gps_modes a.gps_mode in
+        let state_filter_mode = get_indexed_value state_filter_modes a.state_filter_mode
+        and kill_mode = if a.kill_mode then "ON" else "OFF" in
+        let values = ["ac_id", Pprz.String ac;
+                      "flight_time", Pprz.Int64 (Int64.of_int a.flight_time);
+                      "ap_mode", Pprz.String ap_mode;
+                      "gaz_mode", Pprz.String gaz_mode;
+                      "lat_mode", Pprz.String lat_mode;
+                      "horiz_mode", Pprz.String horiz_mode;
+                      "gps_mode", Pprz.String gps_mode;
+                      "state_filter_mode", Pprz.String state_filter_mode;
+                      "kill_mode", Pprz.String kill_mode
+                     ] in
+        Ground_Pprz.message_send my_id "AP_STATUS" values;
+
+        send_cam_status a;
+        send_if_calib a;
+        send_fbw a;
+        send_svsinfo a;
+        send_horiz_status a;
+
+        a.time_since_last_survey_msg <- a.time_since_last_survey_msg +. float aircraft_msg_period /. 1000.;
+        if a.time_since_last_survey_msg > 5. then (* FIXME Two missed messages *)
+          a.survey <- None;
+
+        send_survey_status a;
+        send_dl_values a;
+        send_moved_waypoints a;
+        if !Kml.enabled then
+          Kml.update_waypoints a
       end;
-
-    if !Kml.enabled then
-      Kml.update_ac a;
-
-    begin
-      match a.nav_ref with
-          Some nav_ref ->
-            let values = ["ac_id", Pprz.String ac;
-                          "cur_block", Pprz.Int a.cur_block;
-                          "cur_stage", Pprz.Int a.cur_stage;
-                          "stage_time", Pprz.Int64 (Int64.of_int a.stage_time);
-                          "block_time", Pprz.Int64 (Int64.of_int a.block_time);
-                          "target_lat", f ((Rad>>Deg)a.desired_pos.posn_lat);
-                          "target_long", f ((Rad>>Deg)a.desired_pos.posn_long);
-                          "target_alt", Pprz.Float a.desired_altitude;
-                          "target_climb", Pprz.Float a.desired_climb;
-                          "target_course", Pprz.Float ((Rad>>Deg)a.desired_course);
-                          "dist_to_wp", Pprz.Float a.dist_to_wp
-                         ] in
-            Ground_Pprz.message_send my_id "NAV_STATUS" values
-        | None -> () (* No nav_ref yet *)
-    end;
-
-    let values = ["ac_id", Pprz.String ac;
-                  "throttle", f a.throttle;
-                  "throttle_accu", f a.throttle_accu;
-                  "rpm", f a.rpm;
-                  "temp", f a.temp;
-                  "bat", f a.bat;
-                  "amp", f a.amp;
-                  "energy", Pprz.Int a.energy] in
-    Ground_Pprz.message_send my_id "ENGINE_STATUS" values;
-
-    let ap_mode = get_indexed_value (modes_of_type a.vehicle_type) a.ap_mode in
-    let gaz_mode = get_indexed_value gaz_modes a.gaz_mode in
-    let lat_mode = get_indexed_value lat_modes a.lateral_mode in
-    let horiz_mode = get_indexed_value horiz_modes a.horizontal_mode in
-    let gps_mode = get_indexed_value gps_modes a.gps_mode in
-    let state_filter_mode = get_indexed_value state_filter_modes a.state_filter_mode
-    and kill_mode = if a.kill_mode then "ON" else "OFF" in
-    let values = ["ac_id", Pprz.String ac;
-                  "flight_time", Pprz.Int64 (Int64.of_int a.flight_time);
-                  "ap_mode", Pprz.String ap_mode;
-                  "gaz_mode", Pprz.String gaz_mode;
-                  "lat_mode", Pprz.String lat_mode;
-                  "horiz_mode", Pprz.String horiz_mode;
-                  "gps_mode", Pprz.String gps_mode;
-                  "state_filter_mode", Pprz.String state_filter_mode;
-                  "kill_mode", Pprz.String kill_mode
-                 ] in
-    Ground_Pprz.message_send my_id "AP_STATUS" values;
-
-    send_cam_status a;
-    send_if_calib a;
-    send_fbw a;
-    send_svsinfo a;
-    send_horiz_status a;
-
-    a.time_since_last_survey_msg <- a.time_since_last_survey_msg +. float aircraft_msg_period /. 1000.;
-    if a.time_since_last_survey_msg > 5. then (* FIXME Two missed messages *)
-      a.survey <- None;
-
-    send_survey_status a;
-    send_dl_values a;
-    send_moved_waypoints a;
-    if !Kml.enabled then
-      Kml.update_waypoints a;
+    (* end of block only send if last msg newer than 5s, always send telemetry status *)
     send_telemetry_status a
   with
       Not_found -> prerr_endline ac
