@@ -30,7 +30,6 @@
 #include "firmwares/rotorcraft/guidance/guidance_module.h"
 #include "firmwares/rotorcraft/stabilization.h"
 #include "firmwares/rotorcraft/stabilization/stabilization_attitude_rc_setpoint.h"
-#include "firmwares/rotorcraft/navigation.h"
 #include "subsystems/radio_control.h"
 
 #include "firmwares/rotorcraft/stabilization/stabilization_none.h"
@@ -41,6 +40,10 @@
 #include "firmwares/rotorcraft/guidance/guidance_v.h"
 
 #include "state.h"
+
+#if USE_NAVIGATION
+#include "firmwares/rotorcraft/navigation.h"
+#endif
 
 #ifndef GUIDANCE_H_AGAIN
 #define GUIDANCE_H_AGAIN 0
@@ -370,6 +373,7 @@ void guidance_h_run(bool_t  in_flight)
       break;
 
     case GUIDANCE_H_MODE_NAV:
+#if USE_NAVIGATION
       if (!in_flight) {
         guidance_h_nav_enter();
       }
@@ -397,6 +401,7 @@ void guidance_h_run(bool_t  in_flight)
         stabilization_attitude_set_earth_cmd_i(&guidance_h_cmd_earth,
                                                guidance_h_heading_sp);
       }
+#endif
       stabilization_attitude_run(in_flight);
       break;
 
@@ -536,13 +541,14 @@ static void guidance_h_hover_enter(void)
 
 static void guidance_h_nav_enter(void)
 {
-
+#if USE_NAVIGATION
   /* horizontal position setpoint from navigation/flightplan */
   INT32_VECT2_NED_OF_ENU(guidance_h_pos_sp, navigation_carrot);
 
   reset_guidance_reference_from_current_position();
 
   nav_heading = stateGetNedToBodyEulers_i()->psi;
+#endif
 }
 
 static inline void transition_run(void)

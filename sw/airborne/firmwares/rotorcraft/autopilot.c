@@ -35,7 +35,6 @@
 #include "subsystems/electrical.h"
 #include "subsystems/settings.h"
 #include "subsystems/datalink/telemetry.h"
-#include "firmwares/rotorcraft/navigation.h"
 #include "firmwares/rotorcraft/guidance.h"
 
 #include "firmwares/rotorcraft/stabilization.h"
@@ -44,6 +43,10 @@
 #include "firmwares/rotorcraft/stabilization/stabilization_attitude.h"
 
 #include "generated/settings.h"
+
+#if USE_NAVIGATION
+#include "firmwares/rotorcraft/navigation.h"
+#endif
 
 #if USE_GPS
 #include "subsystems/gps.h"
@@ -286,7 +289,9 @@ void autopilot_init(void)
 
   autopilot_arming_init();
 
+#if USE_NAVIGATION
   nav_init();
+#endif
   guidance_h_init();
   guidance_v_init();
 
@@ -318,7 +323,7 @@ void autopilot_init(void)
 #define NAV_PRESCALER (PERIODIC_FREQUENCY / NAV_FREQ)
 void autopilot_periodic(void)
 {
-
+#if USE_NAVIGATION
   RunOnceEvery(NAV_PRESCALER, compute_dist2_to_home());
 
   if (autopilot_in_flight && autopilot_mode == AP_MODE_NAV) {
@@ -337,7 +342,7 @@ void autopilot_periodic(void)
     // otherwise always call nav_periodic_task so that carrot is always updated in GCS for other modes
     RunOnceEvery(NAV_PRESCALER, nav_periodic_task());
   }
-
+#endif
 
   /* If in FAILSAFE mode and either already not in_flight anymore
    * or just "detected" ground, go to KILL mode.

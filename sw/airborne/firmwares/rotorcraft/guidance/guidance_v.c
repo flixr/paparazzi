@@ -30,11 +30,14 @@
 
 #include "subsystems/radio_control.h"
 #include "firmwares/rotorcraft/stabilization.h"
-#include "firmwares/rotorcraft/navigation.h"
 
 #include "state.h"
 
 #include "math/pprz_algebra_int.h"
+
+#if USE_NAVIGATION
+#include "firmwares/rotorcraft/navigation.h"
+#endif
 
 
 /* error if some gains are negative */
@@ -321,6 +324,7 @@ void guidance_v_run(bool_t in_flight)
 #endif
 
     case GUIDANCE_V_MODE_NAV: {
+#if USE_NAVIGATION
       if (vertical_mode == VERTICAL_MODE_ALT) {
         guidance_v_z_sp = -nav_flight_altitude;
         guidance_v_zd_sp = 0;
@@ -338,6 +342,7 @@ void guidance_v_run(bool_t in_flight)
         guidance_v_z_sum_err = 0;
         guidance_v_delta_t = nav_throttle;
       }
+#endif
 #if !NO_RC_THRUST_LIMIT
       /* use rc limitation if available */
       if (radio_control.status == RC_OK) {

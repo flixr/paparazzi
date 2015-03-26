@@ -104,7 +104,7 @@ $(TARGET).srcs += $(SRC_FIRMWARE)/guidance/guidance_v.c
 $(TARGET).srcs += $(SRC_FIRMWARE)/guidance/guidance_v_ref.c
 $(TARGET).srcs += $(SRC_FIRMWARE)/guidance/guidance_v_adapt.c
 
-include $(CFG_ROTORCRAFT)/navigation.makefile
+#include $(CFG_ROTORCRAFT)/navigation.makefile
 
 $(TARGET).srcs += $(SRC_FIRMWARE)/main.c
 $(TARGET).srcs += $(SRC_FIRMWARE)/autopilot.c

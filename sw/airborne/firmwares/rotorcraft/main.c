@@ -155,7 +155,9 @@ STATIC_INLINE void main_init(void)
   ahrs_init();
 #endif
 
+#if USE_NAVIGATION
   ins_init();
+#endif
 
 #if USE_GPS
   gps_init();
