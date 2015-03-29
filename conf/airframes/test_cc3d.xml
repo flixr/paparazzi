@@ -27,7 +27,7 @@
     <subsystem name="ahrs"          type="int_cmpl_quat">
       <define name="AHRS_GRAVITY_HEURISTIC_FACTOR" value="30"/>
     </subsystem>
-    <subsystem name="ins"/>
+    <!--subsystem name="ins"/-->
   </firmware>
 
   <firmware name="test_progs">
