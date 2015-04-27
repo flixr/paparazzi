@@ -60,6 +60,9 @@ let red_link = ref false
 (* enable broadcast messages by default *)
 let ac_info = ref true
 
+(* send uplink message for any ac_id by default *)
+let ac_id = ref (-1)
+
 (* Listening on an UDP port *)
 let udp = ref false
 let udp_uplink_port = ref 4243
@@ -418,14 +421,16 @@ let hangup = fun _ ->
 (*************** Sending messages over link ***********************************)
 
 let message_uplink = fun device ->
-  let forwarder = fun name _sender vs ->
+  let forwarder = fun name ac_id _sender vs ->
     Debug.call 'f' (fun f -> fprintf f "forward %s\n" name);
-    let ac_id = Pprz.int_assoc "ac_id" vs in
-    let msg_id, _ = Dl_Pprz.message_of_name name in
-    let s = Dl_Pprz.payload_of_values msg_id my_id vs in
-    send ac_id device s High in
-  let set_forwarder = fun name ->
-    ignore (Dl_Pprz.message_bind name (forwarder name)) in
+    let target_ac_id = Pprz.int_assoc "ac_id" vs in
+    if ac_id < 0 || ac_id = target_ac_id then begin
+      let msg_id, _ = Dl_Pprz.message_of_name name in
+      let s = Dl_Pprz.payload_of_values msg_id my_id vs in
+      send target_ac_id device s High
+    end in
+  let set_forwarder = fun name ac_id ->
+    ignore (Dl_Pprz.message_bind name (forwarder name ac_id)) in
 
   let broadcaster = fun name _sender vs ->
     Debug.call 'f' (fun f -> fprintf f "broadcast %s\n" name);
@@ -439,7 +444,7 @@ let message_uplink = fun device ->
   Hashtbl.iter
     (fun _m_id msg ->
       match msg.Pprz.link with
-          Some Pprz.Forwarded -> set_forwarder msg.Pprz.name
+          Some Pprz.Forwarded -> set_forwarder msg.Pprz.name !ac_id
         | Some Pprz.Broadcasted -> if !ac_info then set_broadcaster msg.Pprz.name
         | _ -> ())
     Dl_Pprz.messages
@@ -490,6 +495,7 @@ let () =
       "-xbee_868", Arg.Set Xbee.mode868, (sprintf "Enables the 868 protocol");
       "-redlink", Arg.Set red_link, (sprintf "Sets whether the link is a redundant link. Set this flag and the id flag to use multiple links");
       "-id", Arg.Set_int link_id, (sprintf "<id> Sets the link id. If multiple links are used, each must have a unique id. Default is %i" !link_id);
+      "-ac_id", Arg.Set_int ac_id, (sprintf "<id> Sets the ac_id. Restricts forwarding uplink messages to only that ac_id. Default is %i (any ac_id)" !ac_id);
       "-status_period", Arg.Set_int status_msg_period, (sprintf "<period> Sets the period (in ms) of the LINK_REPORT status message. Default is %i" !status_msg_period);
       "-ping_period", Arg.Set_int ping_msg_period, (sprintf "<period> Sets the period (in ms) of the PING message sent to aircrafs. Default is %i" !ping_msg_period);
       "-ac_timeout", Arg.Set_int dead_aircraft_time_ms, (sprintf "<time> Sets the time (in ms) after which an aircraft is regarded as dead/off if no messages are received. Default is %ims, set to zero to disable." !ping_msg_period)
