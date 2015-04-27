@@ -20,6 +20,7 @@
 
 <!ATTLIST settings
 target CDATA #IMPLIED
+md5sum CDATA #IMPLIED
 >
 
 <!ATTLIST dl_settings

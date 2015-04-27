@@ -54,6 +54,7 @@ let one_ac = fun (notebook:GPack.notebook) ac_name ->
 
     (* Build the buttons and sliders *)
     let xml = Xml.parse_file xml_file in
+    let md5sum = ExtXml.attrib_or_default xml "md5sum" "" in
     let xmls = Xml.children (ExtXml.child xml "dl_settings") in
     let settings = new Page_settings.settings xmls callback ac_id (fun _ _ -> ()) in
 
@@ -62,6 +63,24 @@ let one_ac = fun (notebook:GPack.notebook) ac_name ->
       settings#set (Pprz.int_assoc "index" vs) (Some (string_of_float (Pprz.float_assoc "value" vs)))
     in
     ignore (Tele_Pprz.message_bind "DL_VALUE" get_dl_value);
+
+    (* Bind to ALIVE message to check md5sum *)
+    let check_md5sum = fun _sender vs ->
+      let live_md5sum = Pprz.assoc "md5sum" vs in
+      try
+        match live_md5sum with
+          Pprz.Array array ->
+            let n = Array.length array in
+            assert(n = String.length md5sum / 2);
+            for i = 0 to n - 1 do
+              let x = int_of_string (sprintf "0x%c%c" md5sum.[2*i] md5sum.[2*i+1]) in
+              assert (x = Pprz.int_of_value array.(i))
+            done
+        | _ -> failwith "Array expected here"
+      with _ ->
+        prerr_endline (sprintf "WARNING! MD5SUM mismatch: settings.xml %s, live aircraft\n" md5sum );
+    in
+    if md5sum <> "" then ignore (Tele_Pprz.message_bind "ALIVE" check_md5sum);
 
     (* Get the aiframe file *)
     let af = Xml.attrib aircraft "airframe" in
