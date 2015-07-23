@@ -127,8 +127,8 @@ void hmc58xx_start_configure(struct Hmc58xx *hmc)
   // wait before starting the configuration
   // doing to early may void the mode configuration
   if (hmc->init_status == HMC_CONF_UNINIT && get_sys_time_float() > HMC58XX_STARTUP_DELAY) {
-    hmc->init_status++;
     if (hmc->i2c_trans.status == I2CTransSuccess || hmc->i2c_trans.status == I2CTransDone) {
+      hmc->init_status++;
       hmc58xx_send_config(hmc);
     }
   }
@@ -153,6 +153,8 @@ void hmc58xx_event(struct Hmc58xx *hmc)
   if (hmc->initialized) {
     if (hmc->i2c_trans.status == I2CTransFailed) {
       hmc->i2c_trans.status = I2CTransDone;
+      /* if transaction failed try to re-configure */
+      hmc->init_status = HMC_CONF_UNINIT;
     } else if (hmc->i2c_trans.status == I2CTransSuccess) {
       if (hmc->type == HMC_TYPE_5843) {
         hmc->data.vect.x = Int16FromBuf(hmc->i2c_trans.buf, 0);
