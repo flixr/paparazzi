@@ -58,6 +58,7 @@
       <board name="li[s]?a_mx_.*"/>
       <board name="navstik_.*"/>
       <board name="elle*"/>
+      <board name="crazyflie*"/>
     </boards>
   </mode>
   <mode name="STLink (SWD)">
@@ -68,6 +69,7 @@
       <board name="li[s]?a_mx_.*"/>
       <board name="cc3d"/>
       <board name="elle*"/>
+      <board name="crazyflie*"/>
     </boards>
   </mode>
   <mode name="BlackMagic Probe (SWD)">
@@ -80,6 +82,7 @@
       <board name="px4fmu_.*"/>
       <board name="cc3d"/>
       <board name="elle*"/>
+      <board name="crazyflie*"/>
     </boards>
   </mode>
   <mode name="BlackMagic Probe (JTAG)">
@@ -91,6 +94,7 @@
       <board name="li[s]?a_mx_.*"/>
       <board name="px4fmu_.*"/>
       <board name="elle*"/>
+      <board name="crazyflie*"/>
     </boards>
   </mode>
   <mode name="JTAG (OpenOCD)">
