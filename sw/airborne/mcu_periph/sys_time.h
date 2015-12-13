@@ -34,7 +34,9 @@
 #include <stdlib.h>
 #include "std.h"
 
+#ifdef BOARD_CONFIG
 #include BOARD_CONFIG
+#endif
 
 #ifndef SYS_TIME_NB_TIMER
 #define SYS_TIME_NB_TIMER 16

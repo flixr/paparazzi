@@ -1,0 +1,3 @@
+*.so
+ahrs_float_cmpl.c
+build
