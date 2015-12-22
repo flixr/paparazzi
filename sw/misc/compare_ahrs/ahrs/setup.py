@@ -15,16 +15,18 @@ pprz_airborne = path.join(pprz_src, "sw/airborne")
 
 common_inc_dirs = ['./', path.join(pprz_src, "sw/include"), pprz_airborne, path.join(pprz_airborne, 'arch/sim')]
 
+math_srcs = [path.join(pprz_airborne, 'math/pprz_algebra_int.c'),
+             path.join(pprz_airborne, 'math/pprz_algebra_double.c'),
+             path.join(pprz_airborne, 'math/pprz_algebra_float.c'),
+             path.join(pprz_airborne, 'math/pprz_orientation_conversion.c'),
+             path.join(pprz_airborne, 'math/pprz_trig_int.c')]
+
+# use pprzmath lib which needs to be installed instead of adding math srcs explicitly
 float_cmpl_module = Extension('_float_cmpl',
                               sources=['float_cmpl_wrap.c',
-                                       path.join(pprz_airborne, 'subsystems/ahrs/ahrs_float_cmpl.c'),
-                                       path.join(pprz_airborne, 'math/pprz_algebra_int.c'),
-                                       path.join(pprz_airborne, 'math/pprz_algebra_double.c'),
-                                       path.join(pprz_airborne, 'math/pprz_algebra_float.c'),
-                                       path.join(pprz_airborne, 'math/pprz_orientation_conversion.c'),
-                                       path.join(pprz_airborne, 'math/pprz_trig_int.c'),
-                                      ],
+                                       path.join(pprz_airborne, 'subsystems/ahrs/ahrs_float_cmpl.c')],
                               include_dirs=common_inc_dirs,
+                              libraries=['pprzmath'],
                               extra_compile_args=["-std=c99", "-DAHRS_PROPAGATE_QUAT"])
 
 setup(name='ahrs',

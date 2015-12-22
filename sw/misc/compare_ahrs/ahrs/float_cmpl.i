@@ -2,6 +2,12 @@
 %module float_cmpl
 %feature("autodoc", "3");
 %include "typemaps.i"
+
+/* apply all of the bool typemaps to the paparazzi bool_t */
+%apply bool { bool_t };
+
+%include pprz_algebra_float.i
+
 %{
 #define SWIG_FILE_WITH_INIT
 #include "subsystems/ahrs/ahrs_float_cmpl.h"
@@ -48,6 +54,7 @@ struct AhrsFloatCmpl {
   bool_t is_aligned;
 };
 
+/*
 extern struct AhrsFloatCmpl ahrs_fc;
 
 extern void ahrs_fc_init(void);
@@ -60,16 +67,31 @@ extern void ahrs_fc_propagate(struct FloatRates *gyro, float dt);
 extern void ahrs_fc_update_accel(struct FloatVect3 *accel, float dt);
 extern void ahrs_fc_update_mag(struct FloatVect3 *mag, float dt);
 extern void ahrs_fc_update_gps(struct GpsState *gps_s);
-
-/** Update yaw based on a heading measurement.
- * e.g. from GPS course
- * @param heading Heading in body frame, radians (CW/north)
- */
 void ahrs_fc_update_heading(float heading);
-
-/** Hard reset yaw to a heading.
- * Doesn't affect the bias.
- * Sets ahrs_fc.heading_aligned to TRUE.
- * @param heading Heading in body frame, radians (CW/north)
- */
 void ahrs_fc_realign_heading(float heading);
+*/
+
+%extend AhrsFloatCmpl {
+  AhrsFloatCmpl() {
+    ahrs_fc_init();
+    return &ahrs_fc;
+  }
+  void propagate(struct FloatRates *gyro, float dt) {
+    ahrs_fc_propagate(gyro, dt);
+  }
+  void update_mag(struct FloatVect3 *mag, float dt) {
+    ahrs_fc_update_mag(mag, dt);
+  }
+  void update_accel(struct FloatVect3 *accel, float dt) {
+    ahrs_fc_update_accel(accel, dt);
+  }
+  void recompute_ltp_to_body() {
+    ahrs_fc_recompute_ltp_to_body();
+  }
+  void set_body_to_imu(struct FloatQuat *q_b2i) {
+    ahrs_fc_set_body_to_imu_quat(q_b2i);
+  }
+  bool_t align(struct FloatRates *lp_gyro, struct FloatVect3 *lp_accel, struct FloatVect3 *lp_mag) {
+    return ahrs_fc_align(lp_gyro, lp_accel, lp_mag);
+  }
+};
