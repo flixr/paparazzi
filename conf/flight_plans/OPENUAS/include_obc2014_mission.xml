@@ -186,7 +186,7 @@ TST-3 = -26° 35' 23.2" * 151° 50' 45.9"
       <!-- IDEA Close the hatch so not able to insert payload before there is a 3D fix , however maybe not so handy anyhow since we need to wat be fre we can insert-->
       <!--  <set value="NavDropCloseHatch" var="unit"/> -->
       <!-- if no valid fix or gps accuracy> 15m or no AHRS , it a no-go wait-->
-      <while cond="!GpsFixValid() || gps.pacc > 1500 || stateIsAttitudeValid()"/>
+      <while cond="!GpsFixValid() || gps.pacc > 1500 || !stateIsAttitudeValid()"/>
     </block>
 
 <!-- *********** Set the ground reference height and the home position *********** -->

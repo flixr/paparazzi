@@ -175,6 +175,30 @@
       <subsystem name="uart"/>
     </target>
 
+    <target name="nps" board="pc">
+      <subsystem name="fdm" type="jsbsim"/>
+
+      <subsystem name="control" type="energy"/>
+      <subsystem name="imu" type="aspirin_v2.2"/>
+      <subsystem name="ahrs" type="int_cmpl_quat">
+        <define name="AHRS_GRAVITY_UPDATE_COORDINATED_TURN"/>
+        <define name="USE_MAGNETOMETER" value="FALSE"/>
+      </subsystem>
+      <subsystem name="gps"       type="ublox"/>
+      <subsystem name="navigation"/>
+      <subsystem name="ins" type="alt_float"/>
+      <subsystem name="uart"/>
+
+      <define name="USE_AIRSPEED" value="TRUE"/>
+      <define name="USE_AIRSPEED_AIR_DATA" value="FALSE"/>
+      <define name="USE_BAROMETER" value="TRUE"/>
+      <define name="AGR_CLIMB"/>
+      <define name="TUNE_AGRESSIVE_CLIMB"/>
+      <define name="STRONG_WIND"/>
+      <define name="WIND_INFO"/>
+      <define name="WIND_INFO_RET"/>
+    </target>
+
     <!-- **************************** set for all *******************************-->
     <define name="RADIO_CONTROL_AUTO1"/>
 
@@ -267,7 +291,6 @@
     <!-- addedto test various nav routines-->
     <load name="nav_smooth.xml"/>
     <load name="nav_vertical_raster.xml"/>
-    <load name="nav_line_border.xml"/>
     <load name="nav_line_osam.xml"/>
     <load name="nav_line_border.xml"/>
     <load name="nav_flower.xml"/>
@@ -631,6 +654,15 @@ we had an option to use glovs, or start up spinning the prop after a throw. If t
     <define name="ANGLE" value="7" unit="deg"/><!-- TODO: test and determine best value -->
     <define name="INTERCEPT_AF_SD" value="80" unit="m"/><!--watch it after landing airspeed = 0 thus aircraft throttles up again, not good!-->
     <define name="TARGET_SPEED" value="13" unit="m/s"/>
+  </section>
+
+  <section name="SIMULATOR" prefix="NPS_">
+    <define name="JSBSIM_MODEL" value="Malolo1" type="string"/>
+    <define name="COMMANDS_NB" value="4"/>
+    <define name="ACTUATOR_NAMES" value="throttle-cmd-norm, aileron-cmd-norm, elevator-cmd-norm, rudder-cmd-norm" type="string[]"/>
+    <define name="JSBSIM_LAUNCHSPEED" value="20"/>
+    <define name="SENSORS_PARAMS" value="nps_sensors_params_default.h" type="string"/>
+    <define name="JS_AXIS_MODE" value="4"/>
   </section>
 
 </airframe>
