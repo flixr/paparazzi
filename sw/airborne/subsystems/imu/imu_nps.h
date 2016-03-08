@@ -77,8 +77,9 @@ struct ImuNps {
 
 extern struct ImuNps imu_nps;
 
-extern void imu_feed_gyro_accel(void);
-extern void imu_feed_mag(void);
+extern void imu_feed_gyro(struct DoubleVect3 gyro);
+extern void imu_feed_accel(struct DoubleVect3 accel);
+extern void imu_feed_mag(struct DoubleVect3 mag);
 
 extern void imu_nps_event(void);
 

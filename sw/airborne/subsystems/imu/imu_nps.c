@@ -23,8 +23,6 @@
 #include "subsystems/abi.h"
 #include "generated/airframe.h"
 
-#include "nps_sensors.h"
-
 struct ImuNps imu_nps;
 
 void imu_impl_init(void)
@@ -41,25 +39,27 @@ void imu_periodic(void)
 }
 
 
-void imu_feed_gyro_accel(void)
+void imu_feed_gyro(struct DoubleVect3 gyro)
 {
+  RATES_ASSIGN(imu.gyro_unscaled, gyro.x, gyro.y, gyro.z);
 
-  RATES_ASSIGN(imu.gyro_unscaled, sensors.gyro.value.x, sensors.gyro.value.y, sensors.gyro.value.z);
-  VECT3_ASSIGN(imu.accel_unscaled, sensors.accel.value.x, sensors.accel.value.y, sensors.accel.value.z);
+  // set availability flags...
+  imu_nps.gyro_available = TRUE;
+}
+
+void imu_feed_accel(struct DoubleVect3 accel)
+{
+  VECT3_ASSIGN(imu.accel_unscaled, accel.x, accel.y, accel.z);
 
   // set availability flags...
   imu_nps.accel_available = TRUE;
-  imu_nps.gyro_available = TRUE;
-
 }
 
 
-void imu_feed_mag(void)
+void imu_feed_mag(struct DoubleVect3 mag)
 {
-
-  VECT3_ASSIGN(imu.mag_unscaled, sensors.mag.value.x, sensors.mag.value.y, sensors.mag.value.z);
+  VECT3_ASSIGN(imu.mag_unscaled, mag.x, mag.y, mag.z);
   imu_nps.mag_available = TRUE;
-
 }
 
 void imu_nps_event(void)
