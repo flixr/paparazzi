@@ -3,9 +3,6 @@
 %feature("autodoc", "3");
 %include "typemaps.i"
 
-/* apply all of the bool typemaps to the paparazzi bool_t */
-%apply bool { bool_t };
-
 %include pprz_algebra_float.i
 
 %{
@@ -25,9 +22,9 @@ struct AhrsFloatCmpl {
   struct FloatQuat ltp_to_imu_quat;
   struct FloatRMat ltp_to_imu_rmat;
 
-  bool_t correct_gravity; ///< enable gravity correction during coordinated turns
+  bool correct_gravity; ///< enable gravity correction during coordinated turns
   float ltp_vel_norm; ///< velocity norm for gravity correction during coordinated turns
-  bool_t ltp_vel_norm_valid;
+  bool ltp_vel_norm_valid;
 
   float accel_omega;  ///< filter cut-off frequency for correcting the attitude from accels (pseudo-gravity measurement)
   float accel_zeta;   ///< filter damping for correcting the gyro-bias from accels (pseudo-gravity measurement)
@@ -40,7 +37,7 @@ struct AhrsFloatCmpl {
   uint8_t gravity_heuristic_factor;
   float weight;
 
-  bool_t heading_aligned;
+  bool heading_aligned;
   struct FloatVect3 mag_h;
 
   /* internal counters for the gains */
@@ -51,7 +48,7 @@ struct AhrsFloatCmpl {
   struct OrientationReps ltp_to_body;
 
   enum AhrsFCStatus status;
-  bool_t is_aligned;
+  bool is_aligned;
 };
 
 /*
@@ -61,7 +58,7 @@ extern void ahrs_fc_init(void);
 extern void ahrs_fc_set_body_to_imu(struct OrientationReps *body_to_imu);
 extern void ahrs_fc_set_body_to_imu_quat(struct FloatQuat *q_b2i);
 extern void ahrs_fc_recompute_ltp_to_body(void);
-extern bool_t ahrs_fc_align(struct FloatRates *lp_gyro, struct FloatVect3 *lp_accel,
+extern bool ahrs_fc_align(struct FloatRates *lp_gyro, struct FloatVect3 *lp_accel,
                             struct FloatVect3 *lp_mag);
 extern void ahrs_fc_propagate(struct FloatRates *gyro, float dt);
 extern void ahrs_fc_update_accel(struct FloatVect3 *accel, float dt);
@@ -91,7 +88,7 @@ void ahrs_fc_realign_heading(float heading);
   void set_body_to_imu(struct FloatQuat *q_b2i) {
     ahrs_fc_set_body_to_imu_quat(q_b2i);
   }
-  bool_t align(struct FloatRates *lp_gyro, struct FloatVect3 *lp_accel, struct FloatVect3 *lp_mag) {
+  bool align(struct FloatRates *lp_gyro, struct FloatVect3 *lp_accel, struct FloatVect3 *lp_mag) {
     return ahrs_fc_align(lp_gyro, lp_accel, lp_mag);
   }
 };

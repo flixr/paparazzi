@@ -1,5 +1,7 @@
 from pprz_algebra_float_c cimport FloatQuat, FloatEulers, FloatRates, FloatRMat, FloatVect3
 from libc.stdint cimport uint8_t
+# apparently that also covers C99 bool
+from libcpp cimport bool
 
 cdef extern from "subsystems/ahrs/ahrs_float_cmpl.h":
     struct AhrsFloatCmpl:
@@ -9,9 +11,9 @@ cdef extern from "subsystems/ahrs/ahrs_float_cmpl.h":
         FloatQuat ltp_to_imu_quat
         FloatRMat ltp_to_imu_rmat
 
-        #bool_t correct_gravity
+        bool correct_gravity
         float ltp_vel_norm
-        #bool_t ltp_vel_norm_valid
+        bool ltp_vel_norm_valid
 
         float accel_omega
         float accel_zeta
@@ -21,7 +23,7 @@ cdef extern from "subsystems/ahrs/ahrs_float_cmpl.h":
         uint8_t gravity_heuristic_factor
         float weight
 
-        #bool_t heading_aligned;
+        bool heading_aligned;
         FloatVect3 mag_h
 
         #uint16_t accel_cnt
@@ -31,7 +33,7 @@ cdef extern from "subsystems/ahrs/ahrs_float_cmpl.h":
         #OrientationReps ltp_to_body
 
         #enum AhrsFCStatus status
-        #bool_t is_aligned
+        bool is_aligned
 
 
     AhrsFloatCmpl ahrs_fc
@@ -40,7 +42,7 @@ cdef extern from "subsystems/ahrs/ahrs_float_cmpl.h":
     #void ahrs_fc_set_body_to_imu(OrientationReps *body_to_imu)
     void ahrs_fc_set_body_to_imu_quat(FloatQuat *q_b2i)
     void ahrs_fc_recompute_ltp_to_body()
-    #bool_t ahrs_fc_align(Rates *lp_gyro, FloatVect3 *lp_accel, FloatVect3 *lp_mag)
+    bool ahrs_fc_align(FloatRates *lp_gyro, FloatVect3 *lp_accel, FloatVect3 *lp_mag)
     void ahrs_fc_propagate(FloatRates *gyro, float dt)
     void ahrs_fc_update_accel(FloatVect3 *accel, float dt)
     void ahrs_fc_update_mag(FloatVect3 *mag, float dt)
